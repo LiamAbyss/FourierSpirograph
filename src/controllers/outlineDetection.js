@@ -1,8 +1,7 @@
 var path = require('path')
 
 exports.redirect = (req, res) => {
-    res.status(301);
-    res.location('/index.html');
+    res.redirect('/outline/index.html');
 };
 
 exports.sendIndexHtml = (req, res) => {
