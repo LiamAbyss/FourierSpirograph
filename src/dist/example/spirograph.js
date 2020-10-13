@@ -43,13 +43,14 @@ let show = true
 // eslint-disable-next-line new-cap
 const s = new p5((sketch) => {
   // preload table data
-  sketch.preload = () => { data = sketch.loadTable('../dist/example/datapts.csv', 'csv', 'header') }
+  sketch.preload = () => {
+     data = sketch.loadTable('../dist/example/datapts.csv', 'csv', 'header') 
+    }
 
   sketch.setup = () => {
     sketch.createCanvas(600, 600).parent('spirograph')
     sketch.colorMode(sketch.HSB, 1, 1, 1)
     sketch.background(0.1)
-    // data = loadTable('datapts.csv','csv','header');
 
     sel = sketch.createSelect().parent('spirograph')
     sel.position(10, 10)
@@ -75,16 +76,16 @@ const s = new p5((sketch) => {
       sketch.clear()
     })
 
-    for (let i = 0; i <= 2 * n; i++) {
-      T[i] = 2 * sketch.PI * i / (2 * n + 1)
+    for (let i = 0; i < size; i++) {
+      T[i] = 2 * sketch.PI * i / size
     }
     // ((sketch.cos(k Element(listT, l)) x(Element(listP, l)) + sketch.sin(k Element(listT, l)) y(Element(listP, l))) / size,
     // (sketch.cos(k Element(listT, l)) y(Element(listP, l)) - sketch.sin(k Element(listT, l)) x(Element(listP, l))) / size), l, 1, size
 
-    arrayCx = sketch.make2Darray(size, 2 * n + 1) // Check later the num of row and columns
-    arrayCy = sketch.make2Darray(size, 2 * n + 1)
+    arrayCx = sketch.make2Darray(size, size) // Check later the num of row and columns
+    arrayCy = sketch.make2Darray(size, size)
     for (var i = 0; i < size; i++) {
-      for (var j = 0; j < 2 * n + 1; j++) {
+      for (var j = 0; j < size; j++) {
         const scale = 1.7
         const COSX = sketch.cos((j - n) * T[i]) * scale * data.getNum(i, 'x')
         const SINX = sketch.sin((j - n) * T[i]) * scale * data.getNum(i, 'y')
@@ -280,7 +281,7 @@ const s = new p5((sketch) => {
       }
 
       // The rest of the epicycles.
-      for (let i = 1; i < centerX.length; i++) {
+      for (let i = 1; i < kMax; i++) {
         sketch.stroke(4 * i / (centerX.length), 1, 1)
         sketch.strokeWeight(2)
         sketch.ellipse(centerX[i], -centerY[i], 2 * Rho[sortedNumbers[i] - 1])
@@ -289,7 +290,7 @@ const s = new p5((sketch) => {
       // The radii connecting the epicycles.
       sketch.strokeWeight(2)
       sketch.stroke(0.8)
-      for (let k = 0; k < 2 * kMax; k++) {
+      for (let k = 0; k < 2 * kMax - 1; k++) {
       // stroke((4*k ) / (2 * kMax), 1, 1);
         sketch.line(centerX[k], -centerY[k], centerX[k + 1], -centerY[k + 1])
       }
@@ -311,24 +312,24 @@ const s = new p5((sketch) => {
     // approximated by adding terms in the
     // Fourier series.
 
-      // The approximation curve
-      const func = seriesF
+      // // The approximation curve
+      
       sketch.strokeWeight(3)
       sketch.stroke(1)
       sketch.strokeJoin(sketch.ROUND)
       sketch.noFill()
       sketch.beginShape()
       for (let k = -180; k < 180; k++) {
-        const vs = func(CPosX, CPosY, CNegX, CNegY, radians(k), sketch.max)
+        const vs = sketch.seriesF(CPosX, CPosY, CNegX, CNegY, sketch.radians(k), sketch.max)
         // centerX[0], centerX[0],
-        vertex(centerX[0] + vs.x, -(centerY[0] + vs.y))
+        sketch.vertex(centerX[0] + vs.x, -(centerY[0] + vs.y))
       }
-      sketch.endShape(CLOSE)
+      sketch.endShape(sketch.CLOSE)
       sketch.textSize(17)
       sketch.strokeWeight(0.8)
       sketch.stroke(0)
       sketch.fill(1)
-      sketch.text('n=' + round(sketch.max), 0, -270)
+      sketch.text('n=' + sketch.round(sketch.max), 0, -270)
     }
 
     angle += 0.007
