@@ -12,6 +12,8 @@ window.onload = () => {
   fileInput.addEventListener('input', previewImage)
 
   const slider = document.getElementById('thresholdSlider')
+  const lt = document.getElementById('lt')
+  const ut = document.getElementById('ut')
 
   // eslint-disable-next-line no-undef
   noUiSlider.create(slider, {
@@ -24,9 +26,15 @@ window.onload = () => {
     }
   })
   slider.noUiSlider.on('update', () => {
-    const lt = document.getElementById('lt')
-    const ut = document.getElementById('ut')
-    lt.innerText = `Lower threshold : ${slider.noUiSlider.get()[0]}`
-    ut.innerText = `Upper threshold : ${slider.noUiSlider.get()[1]}`
+    lt.value = slider.noUiSlider.get()[0]
+    ut.value = slider.noUiSlider.get()[1]
+  })
+
+  lt.addEventListener('change', () => {
+    slider.noUiSlider.set([lt.value, null])
+  })
+
+  ut.addEventListener('change', () => {
+    slider.noUiSlider.set([null, ut.value])
   })
 }

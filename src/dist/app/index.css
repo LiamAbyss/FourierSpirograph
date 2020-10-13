@@ -46,6 +46,12 @@ html, body {
     width: 80%;
 }
 
+#lt, #ut {
+    font-size: medium;
+    border: none;
+    max-width: 10%;
+}
+
 .flex-col {
     display: flex;
     flex-direction: column;
