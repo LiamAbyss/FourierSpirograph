@@ -132,12 +132,9 @@ const s = new p5((sketch) => {
     // print(CNegX);
     // print(CNegY);
 
-    for (i = 0; i < 2 * (n); i++) {
+    for (i = 0; i < 2 * n; i++) {
       const cond = sketch.floor(i / 2)
-      if (i === 0) {
-        CCordX[i] = CPosX[cond] // even
-        CCordY[i] = CPosY[cond]
-      } else if (i % 2 === 0) {
+      if (i % 2 === 0) {
         CCordX[i] = CPosX[cond] // even
         CCordY[i] = CPosY[cond]
       } else {
@@ -250,8 +247,10 @@ const s = new p5((sketch) => {
     // The initial circle
       centerX[0] = Cx[(size + 1) / 2 - 1]
       centerY[0] = Cy[(size + 1) / 2 - 1]
-      sketch.stroke(1 / centerX.length, 1, 1)
-      sketch.strokeWeight(2)
+      // sketch.stroke(1 / centerX.length, 1, 1)
+      // sketch.strokeWeight(2)
+      sketch.stroke(255, 50)
+      sketch.strokeWeight(1)
       sketch.ellipse(centerX[0], -centerY[0], 2 * Rho[sortedNumbers[0] - 1])
 
       // I need the centers for the rest of the epicycles.
@@ -282,13 +281,16 @@ const s = new p5((sketch) => {
 
       // The rest of the epicycles.
       for (let i = 1; i < kMax; i++) {
-        sketch.stroke(4 * i / (centerX.length), 1, 1)
-        sketch.strokeWeight(2)
+        // HSV Colors
+        // sketch.stroke(4 * i / (centerX.length), 1, 1)
+        // sketch.strokeWeight(2)
+        sketch.stroke(255, 50)
+        sketch.strokeWeight(1)
         sketch.ellipse(centerX[i], -centerY[i], 2 * Rho[sortedNumbers[i] - 1])
       }
 
       // The radii connecting the epicycles.
-      sketch.strokeWeight(2)
+      sketch.strokeWeight(0.5)
       sketch.stroke(0.8)
       for (let k = 0; k < 2 * kMax - 1; k++) {
       // stroke((4*k ) / (2 * kMax), 1, 1);
@@ -300,7 +302,7 @@ const s = new p5((sketch) => {
 
       sketch.strokeJoin(sketch.ROUND)
       sketch.stroke(1)
-      sketch.strokeWeight(3)
+      sketch.strokeWeight(2)
       sketch.noFill()
       sketch.beginShape()
       for (var pos of path) {
