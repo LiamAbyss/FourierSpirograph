@@ -44,8 +44,8 @@ let show = true
 const s = new p5((sketch) => {
   // preload table data
   sketch.preload = () => {
-     data = sketch.loadTable('../dist/example/datapts.csv', 'csv', 'header') 
-    }
+    data = sketch.loadTable('../dist/example/datapts.csv', 'csv', 'header')
+  }
 
   sketch.setup = () => {
     sketch.createCanvas(600, 600).parent('spirograph')
@@ -313,7 +313,7 @@ const s = new p5((sketch) => {
     // Fourier series.
 
       // // The approximation curve
-      
+
       sketch.strokeWeight(3)
       sketch.stroke(1)
       sketch.strokeJoin(sketch.ROUND)
