@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta charset="utf-8"/>
+      <title>Outline detection</title>
+      <link rel="stylesheet" href="./index.css"/>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.2/nouislider.min.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.2/nouislider.css" integrity="sha512-30YMvFlZRwPH3TcDlPWZofkzGwIwDAKshEue1qWet2yWEQ4Y/X+WnV1aTuNldE3Hbpcl5Zz4PxoXJKMMQvBHGQ==" crossorigin="anonymous" />
+      <script type="text/javascript" src="index.js"></script>
+    </head>
+    <body>
+        <div id="global" class="flex-col space-between">
+            <div id="title" class="center-items">
+                <h1 class="center-text">Fourier Spirograph</h1>
+            </div>
+            <div id="app" class="flex-row">
+                <div id="outlineSettings" class="flex-col center-items">
+                    <div class="flex-col center-items">
+                        <img id="uploadedImage" src="" alt="Choose image"/>
+                        <input type="file" id="uploadImage">
+                    </div>
+                    <!--<input type="text" id="lt" placeholder="Lower Treshold (0-1)">
+                    <input type="text" id="ut" placeholder="Upper Treshold (0-1)">-->
+                    <div id="thresholdSlider"></div>
+                    <div id="thresholdChoices">
+                        <p id="lt">Lower threshold</p>
+                        <p id="ut">Upper threshold</p>
+                    </div>
+                </div>
+                <div id="outlineResults">
+                    
+                    <canvas id="outlineCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
