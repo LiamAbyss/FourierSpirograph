@@ -32,11 +32,114 @@ const getText = (url) => {
 }
 getText('../dist/app/autoThresholds.csv')
 
-const getOutlinePixels = (data) => {
+const nearestPoint = (point, pointsTable) => {
+  if (pointsTable === undefined || pointsTable.length === 0) return
+  let currentDist = 0
+  let minDist = Infinity
+  let nearest = {
+    x: 0,
+    y: 0
+  }
+  for (let i = 0; i < pointsTable.length; i++) {
+    currentDist = Math.sqrt(Math.pow(point.x - pointsTable[i].x, 2) + Math.pow(point.y - pointsTable[i].y, 2))
+    if (currentDist < minDist) {
+      minDist = currentDist
+      nearest = pointsTable[i]
+    }
+  }
+  return nearest
+}
+
+const sortPointsInOrder = (data) => {
+  const newData = []
+  let orderedPoints = []
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] && data[i + 1] && data[i + 2]) {
+      newData.push({
+        x: (i / 4) % window.appData.width,
+        y: Math.floor(i / window.appData.width / 4)
+      })
+    }
+  }
+  let remainingPoints = newData
+  let lastNearest = newData[0]
+  for (let i = 0; i < newData.length; i++) {
+    orderedPoints.push(lastNearest)
+    const buffer = remainingPoints
+    remainingPoints = []
+    for (let j = 0; j < buffer.length; j++) {
+      if (buffer[j].x !== lastNearest.x || buffer[j].y !== lastNearest.y) {
+        remainingPoints.push(buffer[j])
+      }
+    }
+    lastNearest = nearestPoint(lastNearest, remainingPoints)
+  }
+
+  for (let i = 0; i < orderedPoints.length; i++) {
+    if (i % 1) {
+      orderedPoints[i] = undefined
+    }
+  }
+
+  const meshedOrderedPoints = []
+  for (let i = 0; i < orderedPoints.length; i++) {
+    if (orderedPoints[i] !== undefined) {
+      meshedOrderedPoints.push(orderedPoints[i])
+    }
+  }
+  orderedPoints = meshedOrderedPoints
+  console.log(window.appData)
+  let toLog = 'x,y\n'
+  for (let i = 0; i < orderedPoints.length; i++) {
+    toLog += (orderedPoints[i].x - parseFloat(window.appData.width) / 2) + ',' + (parseFloat(orderedPoints[i].y) - window.appData.height / 2) + '\n'
+  }
+  console.log(toLog)
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 0
+    data[i + 1] = 0
+    data[i + 2] = 0
+    data[i + 3] = 255
+  }
+
+  outlineCanvas
+    .getContext('2d')
+    .putImageData(
+      new ImageData(new Uint8ClampedArray(
+        data),
+      window.appData.width, window.appData.height),
+      0,
+      0)
+  for (let i = 0; i < orderedPoints.length; i++) {
+    const tmp = 4 * (window.appData.width * orderedPoints[i].y + orderedPoints[i].x)
+    data[tmp] = i % 255
+    data[tmp + 1] = 255
+    data[tmp + 2] = 0
+    data[tmp + 3] = 255
+  }
+  const ctx = outlineCanvas.getContext('2d')
+  ctx.beginPath()
+  ctx.moveTo(orderedPoints[0].x, orderedPoints[0].y)
+  for (let i = 1; i < orderedPoints.length; i++) {
+    ctx.lineTo(orderedPoints[i].x, orderedPoints[i].y)
+  }
+  ctx.stroke()
+  /* outlineCanvas
+    .getContext('2d')
+    .putImageData(
+      new ImageData(new Uint8ClampedArray(
+        data),
+      window.appData.width, window.appData.height),
+      0,
+      0) */
+  return orderedPoints
+}
+
+const meshOutlinePixels = (data) => {
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
-      if (cpt % 4 !== 0) {
+      if (cpt % 6 !== 0) {
         data[i] = 0
         data[i + 1] = 0
         data[i + 2] = 0
@@ -52,6 +155,8 @@ const getOutlinePixels = (data) => {
       window.appData.width, window.appData.height),
       0,
       0)
+  sortPointsInOrder(data)
+  return data
 }
 
 window.onload = () => {
@@ -209,7 +314,7 @@ window.onload = () => {
       if (computeSize < 0) {
         // console.log(e.data.threshold)
         drawBytesOnCanvasForImg(outlineCanvas, e.data.data)
-        getOutlinePixels(e.data.data)
+        meshOutlinePixels(e.data.data)
       } else if (computeSize >= 0) {
         for (let i = 0; i < predefinedComputedOutlines.length; i++) {
           if (predefinedComputedOutlines[i].ut === e.data.threshold.ut &&
