@@ -39,6 +39,7 @@ const K = []
 
 let sel
 let show = true
+const offset = 350
 
 // eslint-disable-next-line new-cap
 const s = new p5((sketch) => {
@@ -47,8 +48,40 @@ const s = new p5((sketch) => {
     data = sketch.loadTable('../dist/example/datapts.csv', 'csv', 'header')
   }
 
+  sketch.showXYTraces = (x, y) => {
+    const reversePath = [...path].reverse()
+    sketch.strokeWeight(1)
+    sketch.translate(offset, 0)
+    sketch.colorMode(sketch.RGB)
+    sketch.stroke(0, 255, 0)
+    sketch.beginShape()
+    for (let i = 0; i < reversePath.length; i++) {
+      sketch.vertex(i, -reversePath[i].y)
+    }
+    sketch.endShape()
+    sketch.stroke(255, 50)
+    sketch.line(x - offset, -y, reversePath[0].x - x, -reversePath[0].y)
+
+    sketch.translate(-offset, 0)
+
+    sketch.translate(0, offset)
+
+    sketch.stroke(0, 255, 0)
+    sketch.beginShape()
+    for (let i = 0; i < reversePath.length; i++) {
+      sketch.vertex(reversePath[i].x, i)
+    }
+    sketch.endShape()
+
+    sketch.stroke(255, 50)
+    sketch.line(x, -(y + offset), reversePath[0].x, reversePath[0].y - y)
+
+    sketch.translate(0, -offset)
+    sketch.colorMode(sketch.HSB)
+  }
+
   sketch.setup = () => {
-    sketch.createCanvas(600, 600).parent('spirograph')
+    sketch.createCanvas(900, 900).parent('spirograph')
     sketch.colorMode(sketch.HSB, 1, 1, 1)
     sketch.background(0.1)
 
@@ -70,7 +103,7 @@ const s = new p5((sketch) => {
     angle = -sketch.PI
     size = data.getRowCount()
     n = (size - 1) / 2
-    nCircles = sketch.createSlider(2, n, sketch.floor(n / 2)).parent('spirograph')
+    nCircles = sketch.createSlider(1, n, 1).parent('spirograph')
     nCircles.position(10, 30)
     nCircles.changed(() => {
       sketch.clear()
@@ -217,7 +250,7 @@ const s = new p5((sketch) => {
 
   sketch.draw = () => {
     sketch.background(0.1)
-    sketch.translate(sketch.width / 2, sketch.height / 2)
+    sketch.translate(300, 300)
     // scale(0.7);
 
     if (nCircles.value() !== kMax) {
@@ -292,13 +325,15 @@ const s = new p5((sketch) => {
       // The radii connecting the epicycles.
       sketch.strokeWeight(0.5)
       sketch.stroke(0.8)
-      for (let k = 0; k < 2 * kMax - 1; k++) {
+      for (let k = 0; k < kMax; k++) {
       // stroke((4*k ) / (2 * kMax), 1, 1);
         sketch.line(centerX[k], -centerY[k], centerX[k + 1], -centerY[k + 1])
       }
 
       // The path traced by the epicycles.
-      path.push(sketch.createVector(centerX[2 * kMax - 1], centerY[2 * kMax - 1]))
+      path.push(sketch.createVector(centerX[kMax], centerY[kMax]))
+
+      sketch.showXYTraces(centerX[kMax], centerY[kMax])
 
       sketch.strokeJoin(sketch.ROUND)
       sketch.stroke(1)
