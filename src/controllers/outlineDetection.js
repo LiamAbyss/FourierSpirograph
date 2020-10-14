@@ -1,9 +1,5 @@
 var path = require('path')
 
-exports.redirect = (req, res) => {
-  res.redirect('/outline/index.html')
-}
-
 exports.sendIndexHtml = (req, res) => {
   res.status(200)
   res.sendFile(path.resolve('./src/dist/outline/index.html'))

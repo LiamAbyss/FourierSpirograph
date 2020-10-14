@@ -47,16 +47,34 @@ function readFileAsDataURL (file) {
   })
 }
 function _drawImageOnCanvas (canvas, image) {
-  canvas.getContext('2d').drawImage(image, 0, 0)
+  canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height)
   return image
 }
 var drawImageOnCanvas = curry(_drawImageOnCanvas)
 function _setCanvasSizeFromImage (canvas, image) {
   const ratio = image.naturalWidth / image.naturalHeight
+  var MAX_WIDTH = 800
+  var MAX_HEIGHT = 600
+  var width = image.width
+  var height = image.height
+
+  if (width > height) {
+    if (width > MAX_WIDTH) {
+      height *= MAX_WIDTH / width
+      width = MAX_WIDTH
+    }
+  } else {
+    if (height > MAX_HEIGHT) {
+      width *= MAX_HEIGHT / height
+      height = MAX_HEIGHT
+    }
+  }
   canvas.style.width = ''
-  canvas.getContext('2d').clearRect(0, 0, image.width, image.height)
-  canvas.height = image.height
-  canvas.width = image.width
+  canvas.getContext('2d').clearRect(0, 0, width, height)
+  canvas.width = width
+  canvas.height = height
+  image.width = width
+  image.height = height
   return image
 }
 var setCanvasSizeFromImage = curry(_setCanvasSizeFromImage)

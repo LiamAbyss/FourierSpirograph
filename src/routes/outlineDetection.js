@@ -3,7 +3,6 @@ const router = express.Router()
 
 const outlineCtrl = require('../controllers/outlineDetection')
 
-router.get('/', outlineCtrl.redirect)
 router.get('/outline/index.html', outlineCtrl.sendIndexHtml)
 router.get('/dist/outline/index.js', outlineCtrl.sendIndexJs)
 router.get('/dist/outline/worker.js', outlineCtrl.sendWorkerJs)

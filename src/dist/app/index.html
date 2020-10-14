@@ -2,11 +2,12 @@
 <html lang="en">
     <head>
       <meta charset="utf-8"/>
-      <title>Outline detection</title>
-      <link rel="stylesheet" href="./index.css"/>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.2/nouislider.min.js"></script>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.2/nouislider.css" integrity="sha512-30YMvFlZRwPH3TcDlPWZofkzGwIwDAKshEue1qWet2yWEQ4Y/X+WnV1aTuNldE3Hbpcl5Zz4PxoXJKMMQvBHGQ==" crossorigin="anonymous" />
-      <script type="text/javascript" src="index.js"></script>
+      <title>Fourier Spirograph</title>
+      <link rel="stylesheet" href="/dist/app/index.css"/>
+      <script src="/dist/lib/nouislider.js"></script>
+      <link rel="stylesheet" href="/dist/lib/nouislider.css"/>
+      <script src="/dist/outline/main.js"></script>
+      <script type="text/javascript" src="/dist/app/index.js"></script>
     </head>
     <body>
         <div id="global" class="flex-col space-between">
@@ -17,18 +18,20 @@
                 <div id="outlineSettings" class="flex-col center-items">
                     <div class="flex-col center-items">
                         <img id="uploadedImage" src="" alt="Choose image"/>
-                        <input type="file" id="uploadImage">
+                        <input type="file" id="uploadImage" accept="image/*">
                     </div>
                     <div id="thresholdSlider"></div>
+                    <div id="autoThresholdSlider"></div>
                     <div class="center-text" id="thresholdChoices">
                         <label for="lt">Lower Threshold</label>
                         <input type="text" id="lt">
                         <label for="ut">Upper Threshold</label>
                         <input type="text" id="ut">
                     </div>
+                    <button type="button" id="toggleThreshold">Show automatic threshold choices</button>
+                    <button type="button" id="outlineSubmit">Find edges</button>
                 </div>
                 <div id="outlineResults">
-                    
                     <canvas id="outlineCanvas"></canvas>
                 </div>
             </div>
