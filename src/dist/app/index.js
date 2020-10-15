@@ -40,7 +40,12 @@ const nearestPoint = (point, pointsTable) => {
     x: 0,
     y: 0
   }
+  // const margin = 70
   for (let i = 0; i < pointsTable.length; i++) {
+    // if (!((pointsTable[i].x > margin && pointsTable[i].x < (window.appData.width - margin)) && (pointsTable[i].y > margin && pointsTable[i].y < (window.appData.height - margin)))) {
+    //   continue
+    // }
+
     currentDist = Math.sqrt(Math.pow(point.x - pointsTable[i].x, 2) + Math.pow(point.y - pointsTable[i].y, 2))
     if (currentDist < minDist) {
       minDist = currentDist
@@ -53,16 +58,20 @@ const nearestPoint = (point, pointsTable) => {
 const sortPointsInOrder = (data) => {
   const newData = []
   let orderedPoints = []
+  const margin = 10
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
-      newData.push({
-        x: (i / 4) % window.appData.width,
-        y: Math.floor(i / window.appData.width / 4)
-      })
+      if (((i / 4) % window.appData.width > margin && (i / 4) % window.appData.width < outlineCanvas.width - margin) &&
+      (Math.floor(i / window.appData.width / 4) > margin && Math.floor(i / window.appData.width / 4) < outlineCanvas.height - margin)) {
+        newData.push({
+          x: (i / 4) % window.appData.width,
+          y: Math.floor(i / window.appData.width / 4)
+        })
+      }
     }
   }
   let remainingPoints = newData
-  let lastNearest = newData[0]
+  let lastNearest = newData[Math.floor(newData.length / 2)]
   for (let i = 0; i < newData.length; i++) {
     orderedPoints.push(lastNearest)
     const buffer = remainingPoints
@@ -76,7 +85,7 @@ const sortPointsInOrder = (data) => {
   }
 
   for (let i = 0; i < orderedPoints.length; i++) {
-    if (i % 1) {
+    if (i % 4) {
       orderedPoints[i] = undefined
     }
   }
@@ -90,8 +99,11 @@ const sortPointsInOrder = (data) => {
   orderedPoints = meshedOrderedPoints
   console.log(window.appData)
   let toLog = 'x,y\n'
+  // const margin = 70
   for (let i = 0; i < orderedPoints.length; i++) {
-    toLog += (orderedPoints[i].x - parseFloat(window.appData.width) / 2) + ',' + (parseFloat(orderedPoints[i].y) - window.appData.height / 2) + '\n'
+    // if ((orderedPoints[i].x > margin && orderedPoints[i].x < (window.appData.width - margin)) && (orderedPoints[i].y > margin && orderedPoints[i].y < (window.appData.height - margin))) {
+    toLog += (orderedPoints[i].x - outlineCanvas.width / 2) + ',' + (orderedPoints[i].y - outlineCanvas.height / 2) + '\n'
+    // }
   }
   console.log(toLog)
 
@@ -139,7 +151,7 @@ const meshOutlinePixels = (data) => {
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
-      if (cpt % 6 !== 0) {
+      if (cpt % 1 !== 0) {
         data[i] = 0
         data[i + 1] = 0
         data[i + 2] = 0
@@ -201,7 +213,7 @@ window.onload = () => {
     connect: true,
     range: {
       min: 0.01,
-      max: 0.6
+      max: 1
     }
   })
   slider.noUiSlider.on('update', () => {

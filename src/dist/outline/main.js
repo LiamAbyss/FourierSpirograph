@@ -53,8 +53,8 @@ function _drawImageOnCanvas (canvas, image) {
 var drawImageOnCanvas = curry(_drawImageOnCanvas)
 function _setCanvasSizeFromImage (canvas, image) {
   const ratio = image.naturalWidth / image.naturalHeight
-  var MAX_WIDTH = 800
-  var MAX_HEIGHT = 600
+  var MAX_WIDTH = 400
+  var MAX_HEIGHT = 400
   var width = image.width
   var height = image.height
 

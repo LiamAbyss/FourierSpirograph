@@ -366,10 +366,10 @@ const s = new p5((sketch) => {
       sketch.strokeWeight(0.8)
       sketch.stroke(0)
       sketch.fill(1)
-      sketch.text('n=' + sketch.round(sketch.max), 0, -270)
+      sketch.text('n=' + sketch.round(sketch.max), -270, -270)
     }
 
-    angle += 0.007
+    angle += 0.0035
     sketch.max += 0.2
 
     if (angle > 2.5 * sketch.PI) {
