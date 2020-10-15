@@ -40,12 +40,7 @@ const nearestPoint = (point, pointsTable) => {
     x: 0,
     y: 0
   }
-  // const margin = 70
   for (let i = 0; i < pointsTable.length; i++) {
-    // if (!((pointsTable[i].x > margin && pointsTable[i].x < (window.appData.width - margin)) && (pointsTable[i].y > margin && pointsTable[i].y < (window.appData.height - margin)))) {
-    //   continue
-    // }
-
     currentDist = Math.sqrt(Math.pow(point.x - pointsTable[i].x, 2) + Math.pow(point.y - pointsTable[i].y, 2))
     if (currentDist < minDist) {
       minDist = currentDist
@@ -85,6 +80,7 @@ const sortPointsInOrder = (data) => {
   }
 
   for (let i = 0; i < orderedPoints.length; i++) {
+    // AFTERMESH
     if (i % 4) {
       orderedPoints[i] = undefined
     }
@@ -99,11 +95,8 @@ const sortPointsInOrder = (data) => {
   orderedPoints = meshedOrderedPoints
   console.log(window.appData)
   let toLog = 'x,y\n'
-  // const margin = 70
   for (let i = 0; i < orderedPoints.length; i++) {
-    // if ((orderedPoints[i].x > margin && orderedPoints[i].x < (window.appData.width - margin)) && (orderedPoints[i].y > margin && orderedPoints[i].y < (window.appData.height - margin))) {
     toLog += (orderedPoints[i].x - outlineCanvas.width / 2) + ',' + (orderedPoints[i].y - outlineCanvas.height / 2) + '\n'
-    // }
   }
   console.log(toLog)
 
@@ -129,13 +122,6 @@ const sortPointsInOrder = (data) => {
     data[tmp + 2] = 0
     data[tmp + 3] = 255
   }
-  /* const ctx = outlineCanvas.getContext('2d')
-  ctx.beginPath()
-  ctx.moveTo(orderedPoints[0].x, orderedPoints[0].y)
-  for (let i = 1; i < orderedPoints.length; i++) {
-    ctx.lineTo(orderedPoints[i].x, orderedPoints[i].y)
-  }
-  ctx.stroke() */
   outlineCanvas
     .getContext('2d')
     .putImageData(
@@ -151,7 +137,8 @@ const meshOutlinePixels = (data) => {
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
-      if (cpt % 1 !== 0) {
+      // PREMESH
+      if (cpt % 2 !== 0) {
         data[i] = 0
         data[i + 1] = 0
         data[i + 2] = 0
@@ -213,7 +200,7 @@ window.onload = () => {
     connect: true,
     range: {
       min: 0.01,
-      max: 1
+      max: 0.99
     }
   })
   slider.noUiSlider.on('update', () => {
