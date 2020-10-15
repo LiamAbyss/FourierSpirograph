@@ -71,7 +71,8 @@ const sortPointsInOrder = (data) => {
     }
   }
   let remainingPoints = newData
-  let lastNearest = newData[Math.floor(newData.length / 2)]
+  let lastNearest = newData[newData.length - 1]
+  // let lastNearest = newData[Math.floor(newData.length / 2)]
   for (let i = 0; i < newData.length; i++) {
     orderedPoints.push(lastNearest)
     const buffer = remainingPoints
@@ -151,7 +152,7 @@ const meshOutlinePixels = (data) => {
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
-      if (cpt % 1 !== 0) {
+      if (cpt % 4 !== 0) {
         data[i] = 0
         data[i + 1] = 0
         data[i + 2] = 0

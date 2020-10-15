@@ -100,7 +100,7 @@ const s = new p5((sketch) => {
     // print(data.getColumn('y'));
     // print(data.getNum(0, 'x'));
 
-    angle = -sketch.PI
+    angle = sketch.PI / 3
     size = data.getRowCount()
     n = (size - 1) / 2
     nCircles = sketch.createSlider(1, n, 1).parent('spirograph')
@@ -284,7 +284,7 @@ const s = new p5((sketch) => {
       // sketch.strokeWeight(2)
       sketch.stroke(255, 50)
       sketch.strokeWeight(1)
-      sketch.ellipse(centerX[0], -centerY[0], 2 * Rho[sortedNumbers[0] - 1])
+      sketch.ellipse(centerX[0], centerY[0], 2 * Rho[sortedNumbers[0] - 1])
 
       // I need the centers for the rest of the epicycles.
       // eslint-disable-next-line no-unmodified-loop-condition
@@ -319,7 +319,7 @@ const s = new p5((sketch) => {
         // sketch.strokeWeight(2)
         sketch.stroke(255, 50)
         sketch.strokeWeight(1)
-        sketch.ellipse(centerX[i], -centerY[i], 2 * Rho[sortedNumbers[i] - 1])
+        sketch.ellipse(centerX[i], centerY[i], 2 * Rho[sortedNumbers[i] - 1])
       }
 
       // The radii connecting the epicycles.
@@ -327,13 +327,13 @@ const s = new p5((sketch) => {
       sketch.stroke(0.8)
       for (let k = 0; k < kMax; k++) {
       // stroke((4*k ) / (2 * kMax), 1, 1);
-        sketch.line(centerX[k], -centerY[k], centerX[k + 1], -centerY[k + 1])
+        sketch.line(centerX[k], centerY[k], centerX[k + 1], centerY[k + 1])
       }
 
       // The path traced by the epicycles.
-      path.push(sketch.createVector(centerX[kMax], centerY[kMax]))
+      path.push(sketch.createVector(centerX[kMax], -centerY[kMax]))
 
-      sketch.showXYTraces(centerX[kMax], centerY[kMax])
+      sketch.showXYTraces(centerX[kMax], -centerY[kMax])
 
       sketch.strokeJoin(sketch.ROUND)
       sketch.stroke(1)
@@ -369,13 +369,8 @@ const s = new p5((sketch) => {
       sketch.text('n=' + sketch.round(sketch.max), -270, -270)
     }
 
-    angle += 0.0035
+    angle -= 0.007
     sketch.max += 0.2
-
-    if (angle > 2.5 * sketch.PI) {
-      path = []
-      angle = -sketch.PI
-    }
 
     if (sketch.max > n) {
       sketch.max = 1
