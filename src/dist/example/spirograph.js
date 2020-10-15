@@ -250,7 +250,7 @@ const s = new p5((sketch) => {
 
   sketch.draw = () => {
     sketch.background(0.1)
-    sketch.translate(300, 300)
+    sketch.translate(sketch.width / 2, sketch.height / 2)
     // scale(0.7);
 
     if (nCircles.value() !== kMax) {
@@ -356,10 +356,10 @@ const s = new p5((sketch) => {
       sketch.strokeJoin(sketch.ROUND)
       sketch.noFill()
       sketch.beginShape()
-      for (let k = -180; k < 180; k++) {
+      for (let k = -180; k < 180; k += 0.2) {
         const vs = sketch.seriesF(CPosX, CPosY, CNegX, CNegY, sketch.radians(k), sketch.max)
         // centerX[0], centerX[0],
-        sketch.vertex(centerX[0] + vs.x, -(centerY[0] + vs.y))
+        sketch.vertex(centerX[0] + vs.x, (centerY[0] + vs.y))
       }
       sketch.endShape(sketch.CLOSE)
       sketch.textSize(17)

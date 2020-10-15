@@ -117,21 +117,21 @@ const sortPointsInOrder = (data) => {
     data[tmp + 2] = 0
     data[tmp + 3] = 255
   }
-  const ctx = outlineCanvas.getContext('2d')
+  /* const ctx = outlineCanvas.getContext('2d')
   ctx.beginPath()
   ctx.moveTo(orderedPoints[0].x, orderedPoints[0].y)
   for (let i = 1; i < orderedPoints.length; i++) {
     ctx.lineTo(orderedPoints[i].x, orderedPoints[i].y)
   }
-  ctx.stroke()
-  /* outlineCanvas
+  ctx.stroke() */
+  outlineCanvas
     .getContext('2d')
     .putImageData(
       new ImageData(new Uint8ClampedArray(
         data),
       window.appData.width, window.appData.height),
       0,
-      0) */
+      0)
   return orderedPoints
 }
 
