@@ -90,10 +90,15 @@ const sortPointsInOrder = (data) => {
   const meshedOrderedPoints = []
   for (let i = 0; i < orderedPoints.length; i++) {
     if (orderedPoints[i] !== undefined) {
+      orderedPoints[i].x = orderedPoints[i].x - outlineCanvas.width / 2
+      orderedPoints[i].y = orderedPoints[i].y - outlineCanvas.height / 2
       meshedOrderedPoints.push(orderedPoints[i])
     }
   }
   orderedPoints = meshedOrderedPoints
+  if (orderedPoints.length % 2 === 0) {
+    orderedPoints.length = orderedPoints.length - 1
+  }
   console.log(window.appData)
   let toLog = 'x,y\n'
   for (let i = 0; i < orderedPoints.length; i++) {
@@ -155,7 +160,19 @@ const meshOutlinePixels = (data) => {
       window.appData.width, window.appData.height),
       0,
       0)
-  sortPointsInOrder(data)
+
+  const orderedPoints = sortPointsInOrder(data)
+  const rows = [['x', 'y']]
+  orderedPoints.forEach(e => {
+    rows.push([e.x, e.y])
+  })
+
+  const csvContent = 'data:text/csv;charset=utf-8,' +
+    rows.map(e => e.join(',')).join('\n')
+  const encodedUri = encodeURI(csvContent)
+  console.log(encodedUri)
+  launchSpirograph(encodedUri, 'outlineResults')
+
   return data
 }
 
