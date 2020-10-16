@@ -3,7 +3,7 @@
 
 let s
 
-const launchSpirograph = (uri, parent) => {
+const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => {
   if (s !== undefined) {
     s.remove()
   }
@@ -91,33 +91,26 @@ const launchSpirograph = (uri, parent) => {
     }
 
     sketch.setup = () => {
-      sketch.createCanvas(900, 900).parent(parent)
+      const canvas = sketch.createCanvas(canvasWidth, canvasHeight).parent(parent)
+      canvas.id('sketchCanvas')
       sketch.colorMode(sketch.HSB, 1, 1, 1)
-      sketch.background(0.1)
+      sketch.background(1)
 
       sel = sketch.createSelect().parent(parent)
-      sel.position(10, 10)
+      sel.id('sketchModeSelector')
       sel.option('Epicycles')
       sel.option('Approx. Curve')
       sel.changed(sketch.mySelectEvent)
 
-      // count the columns CodingTrain
-      // print(data.getRowCount() + ' total rows in table');
-      // print(data.getColumnCount() + ' total columns in table');
-
-      // print(dataOrder.getColumn('x'));
-
-      // print(data.getColumn('y'));
-      // print(data.getNum(0, 'x'));
+      nCircles = sketch.createSlider(1, n, 1).parent(parent)
+      nCircles.id('nCirclesSlider')
+      nCircles.changed(() => {
+        sketch.clear()
+      })
 
       angle = sketch.PI / 3
       size = data.getRowCount()
       n = (size - 1) / 2
-      nCircles = sketch.createSlider(1, n, 1).parent(parent)
-      nCircles.position(10, 30)
-      nCircles.changed(() => {
-        sketch.clear()
-      })
 
       for (let i = 0; i < size; i++) {
         T[i] = 2 * sketch.PI * i / size
@@ -129,7 +122,7 @@ const launchSpirograph = (uri, parent) => {
       arrayCy = sketch.make2Darray(size, size)
       for (var i = 0; i < size; i++) {
         for (var j = 0; j < size; j++) {
-          const scale = 1.7
+          const scale = 1
           const COSX = sketch.cos((j - n) * T[i]) * scale * data.getNum(i, 'x')
           const SINX = sketch.sin((j - n) * T[i]) * scale * data.getNum(i, 'y')
           const valX = 1 / size * (COSX + SINX)
@@ -272,111 +265,109 @@ const launchSpirograph = (uri, parent) => {
 
       // Polygonal curve:
       // Uncomment if you want to see it.
-      /*
-  //fill(10, 130, 100);
-  noFill();
-  stroke(10, 130, 100);
-  strokeJoin(sketch.ROUND);
-  beginShape();
-  for (let i = 0; i < size; i++) {
-    let xpos = data.getNum(i, 'x');
-    let ypos = data.getNum(i, 'y');
-    vertex(xpos, -ypos);
-  }
-  endShape(CLOSE);
-  */
-
-      if (show === true) { // If 'show' is true, then draw epicycles.
+      sketch.noFill()
+      sketch.stroke(10, 130, 100)
+      sketch.strokeJoin(sketch.ROUND)
+      // sketch.beginShape()
+      for (let i = 0; i < size; i++) {
+        const xpos = data.getNum(i, 'x')
+        const ypos = data.getNum(i, 'y')
+        sketch.point(xpos, ypos)
+        // sketch.endShape(sketch.CLOSE)
+      }
+      if (tracePath) {
+        if (show === true) { // If 'show' is true, then draw epicycles.
         // The initial circle
-        centerX[0] = Cx[(size + 1) / 2 - 1]
-        centerY[0] = Cy[(size + 1) / 2 - 1]
-        // sketch.stroke(1 / centerX.length, 1, 1)
-        // sketch.strokeWeight(2)
-        sketch.stroke(255, 50)
-        sketch.strokeWeight(1)
-        sketch.ellipse(centerX[0], centerY[0], 2 * Rho[sortedNumbers[0] - 1])
-
-        // I need the centers for the rest of the epicycles.
-        // eslint-disable-next-line no-unmodified-loop-condition
-        for (k = 1; k <= size - 1; k++) {
-          sumaX = centerX[0]
-          sumaY = centerY[0]
-          let i = 0
-          while (i <= k - 1) {
-            sumaX += Rho[sortedNumbers[i] - 1] * sketch.cos(Ang[sortedNumbers[i] - 1] * sketch.PI / 180 + angle * K[sortedNumbers[i] - 1])
-            sumaY += Rho[sortedNumbers[i] - 1] * sketch.sin(Ang[sortedNumbers[i] - 1] * sketch.PI / 180 + angle * K[sortedNumbers[i] - 1])
-
-            i++
-          }
-          arrayX[k - 1] = sumaX
-          arrayY[k - 1] = sumaY
-        }
-
-        // array.push(suma);
-        // console.log(suma);
-        // console.log(arrayX.length);
-        // console.log(array);
-
-        for (let i = 1; i < 2 * kMax; i++) {
-          centerX[i] = arrayX[i - 1]
-          centerY[i] = arrayY[i - 1]
-        }
-
-        // The rest of the epicycles.
-        for (let i = 1; i < kMax; i++) {
-        // HSV Colors
-        // sketch.stroke(4 * i / (centerX.length), 1, 1)
-        // sketch.strokeWeight(2)
+          centerX[0] = Cx[(size + 1) / 2 - 1]
+          centerY[0] = Cy[(size + 1) / 2 - 1]
+          // sketch.stroke(1 / centerX.length, 1, 1)
+          // sketch.strokeWeight(2)
           sketch.stroke(255, 50)
           sketch.strokeWeight(1)
-          sketch.ellipse(centerX[i], centerY[i], 2 * Rho[sortedNumbers[i] - 1])
-        }
+          sketch.ellipse(centerX[0], centerY[0], 2 * Rho[sortedNumbers[0] - 1])
 
-        // The radii connecting the epicycles.
-        sketch.strokeWeight(0.5)
-        sketch.stroke(0.8)
-        for (let k = 0; k < kMax; k++) {
+          // I need the centers for the rest of the epicycles.
+          // eslint-disable-next-line no-unmodified-loop-condition
+          for (k = 1; k <= size - 1; k++) {
+            sumaX = centerX[0]
+            sumaY = centerY[0]
+            let i = 0
+            while (i <= k - 1) {
+              sumaX += Rho[sortedNumbers[i] - 1] * sketch.cos(Ang[sortedNumbers[i] - 1] * sketch.PI / 180 + angle * K[sortedNumbers[i] - 1])
+              sumaY += Rho[sortedNumbers[i] - 1] * sketch.sin(Ang[sortedNumbers[i] - 1] * sketch.PI / 180 + angle * K[sortedNumbers[i] - 1])
+
+              i++
+            }
+            arrayX[k - 1] = sumaX
+            arrayY[k - 1] = sumaY
+          }
+
+          // array.push(suma);
+          // console.log(suma);
+          // console.log(arrayX.length);
+          // console.log(array);
+
+          for (let i = 1; i < 2 * kMax; i++) {
+            centerX[i] = arrayX[i - 1]
+            centerY[i] = arrayY[i - 1]
+          }
+
+          // The rest of the epicycles.
+          for (let i = 1; i < kMax; i++) {
+            // HSV Colors
+            // sketch.stroke(4 * i / (centerX.length), 1, 1)
+            // sketch.strokeWeight(2)
+            sketch.stroke(255, 50)
+            sketch.strokeWeight(1)
+            sketch.ellipse(centerX[i], centerY[i], 2 * Rho[sortedNumbers[i] - 1])
+          }
+
+          // The radii connecting the epicycles.
+          sketch.strokeWeight(0.5)
+          sketch.stroke(0.8)
+          for (let k = 0; k < kMax; k++) {
           // stroke((4*k ) / (2 * kMax), 1, 1);
-          sketch.line(centerX[k], centerY[k], centerX[k + 1], centerY[k + 1])
-        }
+            sketch.line(centerX[k], centerY[k], centerX[k + 1], centerY[k + 1])
+          }
 
-        // The path traced by the epicycles.
-        path.push(sketch.createVector(centerX[kMax], -centerY[kMax]))
+          // The path traced by the epicycles.
+          path.push(sketch.createVector(centerX[kMax], -centerY[kMax]))
 
-        sketch.showXYTraces(centerX[kMax], -centerY[kMax])
+          sketch.showXYTraces(centerX[kMax], -centerY[kMax])
 
-        sketch.strokeJoin(sketch.ROUND)
-        sketch.stroke(1)
-        sketch.strokeWeight(2)
-        sketch.noFill()
-        sketch.beginShape()
-        for (var pos of path) {
-          sketch.vertex(pos.x, -pos.y)
-        }
-        sketch.endShape()
-      } else {
+          sketch.strokeJoin(sketch.ROUND)
+          sketch.stroke(1)
+          sketch.strokeWeight(2)
+          sketch.noFill()
+          sketch.beginShape()
+          for (var pos of path) {
+            sketch.vertex(pos.x, -pos.y)
+          }
+          sketch.endShape()
+        } else {
         // If 'show' is false, then show the curve
         // approximated by adding terms in the
         // Fourier series.
 
-        // // The approximation curve
+          // // The approximation curve
 
-        sketch.strokeWeight(3)
-        sketch.stroke(1)
-        sketch.strokeJoin(sketch.ROUND)
-        sketch.noFill()
-        sketch.beginShape()
-        for (let k = -180; k < 180; k += 0.2) {
-          const vs = sketch.seriesF(CPosX, CPosY, CNegX, CNegY, sketch.radians(k), sketch.max)
-          // centerX[0], centerX[0],
-          sketch.vertex(centerX[0] + vs.x, (centerY[0] + vs.y))
+          sketch.strokeWeight(3)
+          sketch.stroke(1)
+          sketch.strokeJoin(sketch.ROUND)
+          sketch.noFill()
+          sketch.beginShape()
+          for (let k = -180; k < 180; k += 0.2) {
+            const vs = sketch.seriesF(CPosX, CPosY, CNegX, CNegY, sketch.radians(k), sketch.max)
+            // centerX[0], centerX[0],
+            sketch.vertex(centerX[0] + vs.x, (centerY[0] + vs.y))
+          }
+          sketch.endShape(sketch.CLOSE)
+          sketch.textSize(17)
+          sketch.strokeWeight(0.8)
+          sketch.stroke(0)
+          sketch.fill(1)
+          sketch.text('n=' + sketch.round(sketch.max), -270, -270)
         }
-        sketch.endShape(sketch.CLOSE)
-        sketch.textSize(17)
-        sketch.strokeWeight(0.8)
-        sketch.stroke(0)
-        sketch.fill(1)
-        sketch.text('n=' + sketch.round(sketch.max), -270, -270)
       }
 
       angle -= 0.007

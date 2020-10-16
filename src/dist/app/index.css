@@ -30,6 +30,8 @@ html, body {
 }
 
 #outlineResults {
+    display: flex;
+    flex-direction: column-reverse;
     height: 100%;
     width: 69%;
     margin-right: 1%;
@@ -58,6 +60,18 @@ html, body {
     text-align: center;
     margin-top: -19px;/*-5.6%;*/
     z-index: 100;
+}
+
+#outlineCanvas{
+    display: none;
+}
+
+#nCirclesSlider{
+    width: 50%;
+}
+
+#sketchModeSelector{
+    width: 25%;
 }
 
 .noUi-tooltip {

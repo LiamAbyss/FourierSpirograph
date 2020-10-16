@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
       <meta charset="utf-8"/>
-      <title>Fourier Spirograph</title>
+      <title>Fourier Spirograph Alpha v0.2</title>
       <link rel="stylesheet" href="/dist/app/index.css"/>
       <script src="/dist/lib/nouislider.js"></script>
       <link rel="stylesheet" href="/dist/lib/nouislider.css"/>
@@ -13,8 +13,9 @@
     </head>
     <body>
         <div id="global" class="flex-col space-between">
-            <div id="title" class="center-items">
+            <div id="title" class="center-items center-text">
                 <h1 class="center-text">Fourier Spirograph</h1>
+                <p> Alpha v0.2</p>
             </div>
             <div id="app" class="flex-row">
                 <div id="outlineSettings" class="flex-col center-items">
@@ -33,7 +34,7 @@
                     <button type="button" id="toggleThreshold">Show automatic threshold choices</button>
                     <button type="button" id="outlineSubmit">Find edges</button>
                 </div>
-                <div id="outlineResults">
+                <div id="outlineResults" class="center-items">
                     <canvas id="outlineCanvas"></canvas>
                 </div>
             </div>

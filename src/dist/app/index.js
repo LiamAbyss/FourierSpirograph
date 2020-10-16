@@ -3,6 +3,7 @@ let predefinedThresholdsFile = ''
 let predefinedThresholds
 let predefinedComputedOutlines = []
 let computeSize = -1
+let outlineResults
 
 const getThresholdsFromCsv = (thresholdFile) => {
   const res = []
@@ -144,7 +145,7 @@ const meshOutlinePixels = (data) => {
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
       // PREMESH
-      if (cpt % 2 !== 0) {
+      if (cpt % 4 !== 0) {
         data[i] = 0
         data[i + 1] = 0
         data[i + 2] = 0
@@ -171,13 +172,14 @@ const meshOutlinePixels = (data) => {
     rows.map(e => e.join(',')).join('\n')
   const encodedUri = encodeURI(csvContent)
   console.log(encodedUri)
-  launchSpirograph(encodedUri, 'outlineResults')
+  launchSpirograph(encodedUri, 'outlineResults', true, outlineResults.offsetWidth - 50, outlineResults.offsetHeight - 50)
 
   return data
 }
 
 window.onload = () => {
   // When an image is loaded
+  outlineResults = document.getElementById('outlineResults')
   const fileInput = document.getElementById('uploadImage')
   const outlineCanvas = document.getElementById('outlineCanvas')
   let imgd
