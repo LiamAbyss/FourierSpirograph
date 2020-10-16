@@ -51,10 +51,9 @@ const nearestPoint = (point, pointsTable) => {
   return nearest
 }
 
-const sortPointsInOrder = (data) => {
+const sortPointsInOrder = (data, margin) => {
   const newData = []
   let orderedPoints = []
-  const margin = 10
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
       if (((i / 4) % window.appData.width > margin && (i / 4) % window.appData.width < outlineCanvas.width - margin) &&
@@ -140,7 +139,7 @@ const sortPointsInOrder = (data) => {
   return orderedPoints
 }
 
-const meshOutlinePixels = (data) => {
+const meshOutlinePixels = (data, margin) => {
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
@@ -162,7 +161,7 @@ const meshOutlinePixels = (data) => {
       0,
       0)
 
-  const orderedPoints = sortPointsInOrder(data)
+  const orderedPoints = sortPointsInOrder(data, margin)
   const rows = [['x', 'y']]
   orderedPoints.forEach(e => {
     rows.push([e.x, e.y])
@@ -182,6 +181,7 @@ window.onload = () => {
   outlineResults = document.getElementById('outlineResults')
   const fileInput = document.getElementById('uploadImage')
   const outlineCanvas = document.getElementById('outlineCanvas')
+  const marginInput = document.getElementById('imageMargin')
   let imgd
   function previewImage () {
     var oFReader = new FileReader()
@@ -204,6 +204,7 @@ window.onload = () => {
           .getContext('2d')
           .getImageData(0, 0, window.appData.width, window.appData.height)
       })
+    marginInput.setAttribute('max', Math.min(outlineCanvas.width, outlineCanvas.height))
   };
   fileInput.addEventListener('input', previewImage)
 
@@ -256,7 +257,7 @@ window.onload = () => {
   autoSlider.setAttribute('disabled', true)
 
   autoSlider.noUiSlider.on('update', () => {
-    if (predefinedThresholds === undefined) return
+    if (predefinedThresholds === undefined || predefinedComputedOutlines.length === 0) return
     lt.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].lt
     ut.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].ut
     // console.log(predefinedComputedOutlines.length)
@@ -333,7 +334,7 @@ window.onload = () => {
       if (computeSize < 0) {
         // console.log(e.data.threshold)
         drawBytesOnCanvasForImg(outlineCanvas, e.data.data)
-        meshOutlinePixels(e.data.data)
+        meshOutlinePixels(e.data.data, marginInput.value)
       } else if (computeSize >= 0) {
         for (let i = 0; i < predefinedComputedOutlines.length; i++) {
           if (predefinedComputedOutlines[i].ut === e.data.threshold.ut &&

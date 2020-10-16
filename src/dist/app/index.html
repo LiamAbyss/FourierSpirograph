@@ -21,7 +21,11 @@
                 <div id="outlineSettings" class="flex-col center-items">
                     <div class="flex-col center-items">
                         <img id="uploadedImage" src="" alt="Choose image"/>
-                        <input type="file" id="uploadImage" accept="image/*">
+                        <input type="file" id="uploadImage" accept="image/*"/>
+                        <div>
+                            <label for="imageMargin">Margin</label>
+                            <input type="number" id="imageMargin" name="imageMargin" min="0" value="0"/>
+                        </div>
                     </div>
                     <div id="thresholdSlider"></div>
                     <div id="autoThresholdSlider"></div>
