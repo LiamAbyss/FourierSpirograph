@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta charset="utf-8"/>
+      <title>Fourier Spirograph Alpha v0.2.1</title>
+      <link rel="stylesheet" href="/dist/app/index.css"/>
+      <script src="/dist/lib/nouislider.js"></script>
+      <link rel="stylesheet" href="/dist/lib/nouislider.css"/>
+      <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.min.js"> </script>
+      <script src="/dist/example/spirograph.js"> </script>      
+      <script src="/dist/outline/main.js"></script>
+      <script type="text/javascript" src="/dist/app/index.js"></script>
+    </head>
+    <body>
+        <div id="global" class="flex-col space-between">
+            <div id="title" class="center-items center-text">
+                <h1 class="center-text">Fourier Spirograph</h1>
+                <p> Alpha v0.2.1</p>
+            </div>
+            <div id="app" class="flex-row">
+                <div id="outlineSettings" class="flex-col center-items">
+                    <div class="flex-col center-items">
+                        <img id="uploadedImage" src="" alt="Choose image"/>
+                        <input type="file" id="uploadImage" accept="image/*"/>
+                        <div>
+                            <label for="imageMargin">Margin</label>
+                            <input type="number" id="imageMargin" name="imageMargin" min="0" value="0"/>
+                        </div>
+                    </div>
+                    <div id="thresholdSlider"></div>
+                    <div id="autoThresholdSlider"></div>
+                    <div class="center-text" id="thresholdChoices">
+                        <label for="lt">Lower Threshold</label>
+                        <input type="text" id="lt">
+                        <label for="ut">Upper Threshold</label>
+                        <input type="text" id="ut">
+                    </div>
+                    <button type="button" id="toggleThreshold">Show automatic threshold choices</button>
+                    <button type="button" id="outlineSubmit">Find edges</button>
+                </div>
+                <div id="outlineResults" class="center-items">
+                    <canvas id="outlineCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
