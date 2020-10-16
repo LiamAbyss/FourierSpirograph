@@ -389,6 +389,10 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     }
 
     sketch.arrayColumnsSum = (array) => {
+      if (array === undefined || array.length === 0) {
+        s.remove()
+        return
+      }
       return array.reduce((a, b) => // replaces two elements in array by sum of them
         a.map((x, i) => // for every `a` element returns...
           x + // its value and...

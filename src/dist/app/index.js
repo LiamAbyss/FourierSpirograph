@@ -96,7 +96,7 @@ const sortPointsInOrder = (data, margin) => {
     }
   }
   orderedPoints = meshedOrderedPoints
-  if (orderedPoints.length % 2 === 0) {
+  if (orderedPoints.length % 2 === 0 && orderedPoints.length) {
     orderedPoints.length = orderedPoints.length - 1
   }
   console.log(window.appData)
@@ -170,7 +170,6 @@ const meshOutlinePixels = (data, margin) => {
   const csvContent = 'data:text/csv;charset=utf-8,' +
     rows.map(e => e.join(',')).join('\n')
   const encodedUri = encodeURI(csvContent)
-  console.log(encodedUri)
   launchSpirograph(encodedUri, 'outlineResults', true, outlineResults.offsetWidth - 50, outlineResults.offsetHeight - 50)
 
   return data
@@ -261,14 +260,16 @@ window.onload = () => {
     lt.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].lt
     ut.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].ut
     // console.log(predefinedComputedOutlines.length)
-    outlineCanvas
-      .getContext('2d')
-      .putImageData(
-        new ImageData(new Uint8ClampedArray(
-          predefinedComputedOutlines[parseInt(autoSlider.noUiSlider.get()) - 1].data),
-        window.appData.width, window.appData.height),
-        0,
-        0)
+    // outlineCanvas
+    //   .getContext('2d')
+    //   .putImageData(
+    //     new ImageData(new Uint8ClampedArray(
+    //       predefinedComputedOutlines[parseInt(autoSlider.noUiSlider.get()) - 1].data),
+    //     window.appData.width, window.appData.height),
+    //     0,
+    //     0)
+
+    meshOutlinePixels([...predefinedComputedOutlines[parseInt(autoSlider.noUiSlider.get()) - 1].data], marginInput.value)
   })
 
   // Toggle Sliders
