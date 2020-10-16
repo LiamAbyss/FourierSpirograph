@@ -255,7 +255,7 @@ window.onload = () => {
   autoSlider.setAttribute('disabled', true)
 
   autoSlider.noUiSlider.on('update', () => {
-    if (predefinedThresholds === undefined || predefinedComputedOutlines === undefined) return
+    if (predefinedThresholds === undefined || predefinedComputedOutlines.length === 0) return
     lt.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].lt
     ut.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].ut
     // console.log(predefinedComputedOutlines.length)
