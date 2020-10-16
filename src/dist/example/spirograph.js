@@ -269,12 +269,14 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       sketch.stroke(10, 130, 100)
       sketch.strokeJoin(sketch.ROUND)
       // sketch.beginShape()
+      sketch.colorMode(sketch.HSB)
       for (let i = 0; i < size; i++) {
         const xpos = data.getNum(i, 'x')
         const ypos = data.getNum(i, 'y')
+        sketch.stroke(i / size, 1, 1)
         sketch.point(xpos, ypos)
-        // sketch.endShape(sketch.CLOSE)
       }
+      // sketch.endShape(sketch.CLOSE)
       if (tracePath) {
         if (show === true) { // If 'show' is true, then draw epicycles.
         // The initial circle
