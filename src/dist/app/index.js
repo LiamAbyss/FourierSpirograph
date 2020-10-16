@@ -140,6 +140,7 @@ const sortPointsInOrder = (data, margin) => {
 }
 
 const meshOutlinePixels = (data, margin) => {
+  if (data === undefined || data.length === 0) return
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
@@ -162,11 +163,11 @@ const meshOutlinePixels = (data, margin) => {
       0)
 
   const orderedPoints = sortPointsInOrder(data, margin)
+  if (orderedPoints.length === 0) return
   const rows = [['x', 'y']]
   orderedPoints.forEach(e => {
     rows.push([e.x, e.y])
   })
-
   const csvContent = 'data:text/csv;charset=utf-8,' +
     rows.map(e => e.join(',')).join('\n')
   const encodedUri = encodeURI(csvContent)
