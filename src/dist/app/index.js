@@ -4,6 +4,8 @@ let predefinedThresholds
 let predefinedComputedOutlines = []
 let computeSize = -1
 let outlineResults
+let premeshSel
+let aftermeshSel
 
 const getThresholdsFromCsv = (thresholdFile) => {
   const res = []
@@ -82,7 +84,7 @@ const sortPointsInOrder = (data, margin) => {
 
   for (let i = 0; i < orderedPoints.length; i++) {
     // AFTERMESH
-    if (i % 4) {
+    if (i % aftermeshSel.value) {
       orderedPoints[i] = undefined
     }
   }
@@ -145,7 +147,7 @@ const meshOutlinePixels = (data, margin) => {
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
       // PREMESH
-      if (cpt % 4 !== 0) {
+      if (cpt % premeshSel.value !== 0) {
         data[i] = 0
         data[i + 1] = 0
         data[i + 2] = 0
@@ -179,6 +181,8 @@ const meshOutlinePixels = (data, margin) => {
 window.onload = () => {
   // When an image is loaded
   outlineResults = document.getElementById('outlineResults')
+  premeshSel = document.getElementById('premesh')
+  aftermeshSel = document.getElementById('aftermesh')
   const fileInput = document.getElementById('uploadImage')
   const outlineCanvas = document.getElementById('outlineCanvas')
   const marginInput = document.getElementById('imageMargin')
