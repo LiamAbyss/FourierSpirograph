@@ -48,9 +48,23 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let show = true
   const offset = 350
 
+  const centerX = []
+  const centerY = []
+  let sumaX
+  let sumaY
+  const arrayX = []
+  const arrayY = []
+
+  const controls = {
+    view: { x: 0, y: 0, zoom: 1 },
+    viewPos: { prevX: null, prevY: null, isDragging: false }
+  }
+
   // eslint-disable-next-line new-cap
   s = new p5((p) => {
-  // preload table data
+    // From https://github.com/nenadV91/p5_zoom
+
+    // preload table data
     p.preload = () => {
       if (uri === undefined) {
         uri = '../dist/example/datapts.csv'
@@ -107,6 +121,14 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       nCircles.changed(() => {
         p.clear()
       })
+
+      cam = new Cam(p.width / 2, p.height / 2)
+
+      canvas.mouseWheel(e => cam.zoom(e, p))
+
+      document.getElementById('sketchCanvas').addEventListener('mousedown', (e) => cam.mousePressed(e))
+      document.getElementById('sketchCanvas').addEventListener('mousemove', (e) => cam.mouseDragged(e, p))
+      document.getElementById('sketchCanvas').addEventListener('mouseup', (e) => cam.mouseReleased(e))
 
       angle = p.PI / 3
       size = data.getRowCount()
@@ -243,20 +265,11 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
     // Draw function
 
-    // I need more arrays.
-    const centerX = []
-    const centerY = []
-    let sumaX
-    let sumaY
-    const arrayX = []
-    const arrayY = []
-
     p.draw = () => {
       p.background(0.1)
-      p.translate(p.width / 2, p.height / 2)
+      p.translate(cam.world.x, cam.world.y)
+      p.scale(cam.view.zoom)
       // scale(0.7);
-
-      p.scale(sf)
 
       if (nCircles.value() !== kMax) {
         path = []
