@@ -68,7 +68,8 @@ const sortPointsInOrder = (data, margin) => {
     }
   }
   let remainingPoints = newData
-  /*
+  // FIRST METHOD
+
   let lastNearest = newData[newData.length - 1]
   for (let i = 0; i < newData.length; i++) {
     orderedPoints.push(lastNearest)
@@ -81,7 +82,9 @@ const sortPointsInOrder = (data, margin) => {
     }
     lastNearest = nearestPoint(lastNearest, remainingPoints)
   }
-  */
+
+  // SECOND METHOD
+  /*
   const beginPoint = newData[0]
   const endPoint = nearestPoint(beginPoint, remainingPoints)
   let lastNearest = beginPoint
@@ -117,7 +120,7 @@ const sortPointsInOrder = (data, margin) => {
   for (let i = endOrderedPoints.length - 1; i >= 0; i--) {
     orderedPoints.push(endOrderedPoints[i])
   }
-  // orderedPoints.push(...(endOrderedPoints.reverse()))
+  */
 
   for (let i = 0; i < orderedPoints.length; i++) {
     // AFTERMESH

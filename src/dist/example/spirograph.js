@@ -256,7 +256,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       p.translate(p.width / 2, p.height / 2)
       // scale(0.7);
 
-      p.scale(sf)
+      // p.scale(sf)
 
       if (nCircles.value() !== kMax) {
         path = []
