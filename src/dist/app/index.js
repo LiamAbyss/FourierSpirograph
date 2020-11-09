@@ -68,8 +68,8 @@ const sortPointsInOrder = (data, margin) => {
     }
   }
   let remainingPoints = newData
+  /*
   let lastNearest = newData[newData.length - 1]
-  // let lastNearest = newData[Math.floor(newData.length / 2)]
   for (let i = 0; i < newData.length; i++) {
     orderedPoints.push(lastNearest)
     const buffer = remainingPoints
@@ -81,6 +81,43 @@ const sortPointsInOrder = (data, margin) => {
     }
     lastNearest = nearestPoint(lastNearest, remainingPoints)
   }
+  */
+  const beginPoint = newData[0]
+  const endPoint = nearestPoint(beginPoint, remainingPoints)
+  let lastNearest = beginPoint
+  let lastEndNearest = endPoint
+  const endOrderedPoints = []
+  // let lastNearest = newData[Math.floor(newData.length / 2)]
+  for (let i = 0; i < newData.length / 2; i++) {
+    if (lastNearest !== undefined) {
+      orderedPoints.push(lastNearest)
+      const buffer = remainingPoints
+      remainingPoints = []
+      for (let j = 0; j < buffer.length; j++) {
+        if (buffer[j].x !== lastEndNearest.x || buffer[j].y !== lastEndNearest.y) {
+          remainingPoints.push(buffer[j])
+        }
+      }
+      lastNearest = nearestPoint(lastNearest, remainingPoints)
+    }
+
+    if (lastEndNearest !== undefined) {
+      endOrderedPoints.push(lastEndNearest)
+      const buffer = remainingPoints
+      remainingPoints = []
+      for (let j = 0; j < buffer.length; j++) {
+        if (buffer[j].x !== lastNearest.x || buffer[j].y !== lastNearest.y) {
+          remainingPoints.push(buffer[j])
+        }
+      }
+      lastEndNearest = nearestPoint(lastEndNearest, remainingPoints)
+    }
+  }
+
+  for (let i = endOrderedPoints.length - 1; i >= 0; i--) {
+    orderedPoints.push(endOrderedPoints[i])
+  }
+  // orderedPoints.push(...(endOrderedPoints.reverse()))
 
   for (let i = 0; i < orderedPoints.length; i++) {
     // AFTERMESH

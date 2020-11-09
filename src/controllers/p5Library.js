@@ -12,5 +12,6 @@ exports.sendSpirographJs = (req, res) => {
 
 exports.sendSpirographData = (req, res) => {
   res.status(200)
+  res.header('Access-Control-Allow-Origin', '*')
   res.sendFile(path.resolve('./src/dist/example/datapts.csv'))
 }
