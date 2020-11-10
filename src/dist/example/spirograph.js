@@ -16,44 +16,44 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let size // = Length(listP)
   let n // = (size - 1)/2
 
-  const T = []
+  let T = []
 
   let kMax // Number of orbits = 2*kMax
 
-  let arrayCx = []
   const arrayC0x = []
+  let arrayCx = []
   let arrayCy = []
   let tempCx = []
   let tempCy = []
   let Cx
   let Cy
 
-  const CPosX = []
-  const CPosY = []
-  const CNegX = []
-  const CNegY = []
+  let CPosX = []
+  let CPosY = []
+  let CNegX = []
+  let CNegY = []
 
-  const CCordX = []
-  const CCordY = []
+  let CCordX = []
+  let CCordY = []
 
-  const Rho = []
+  let Rho = []
   let indexRho = []
-  const sortedNumbers = [] // I did it.
+  let sortedNumbers = [] // I did it.
 
-  const Ang = []
+  let Ang = []
 
-  const K = []
+  let K = []
 
   let sel
   let show = true
   const offset = 350
 
-  const centerX = []
-  const centerY = []
+  let centerX = []
+  let centerY = []
   let sumaX
   let sumaY
-  const arrayX = []
-  const arrayY = []
+  let arrayX = []
+  let arrayY = []
 
   const controls = {
     view: { x: 0, y: 0, zoom: 1 },
@@ -125,12 +125,39 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       cam = new Cam(p.width / 2, p.height / 2)
 
       canvas.mouseWheel(e => cam.zoom(e, p))
-
       document.getElementById('sketchCanvas').addEventListener('mousedown', (e) => cam.mousePressed(e))
       document.getElementById('sketchCanvas').addEventListener('mousemove', (e) => cam.mouseDragged(e, p))
       document.getElementById('sketchCanvas').addEventListener('mouseup', (e) => cam.mouseReleased(e))
 
       angle = p.PI / 3
+
+      p.setSetup()
+      // print(K);
+    }
+
+    p.setSetup = () => {
+      path = []
+      arrayCx = []
+      arrayCy = []
+      tempCx = []
+      tempCy = []
+      CPosX = []
+      CPosY = []
+      CNegX = []
+      CNegY = []
+      CCordX = []
+      CCordY = []
+      Rho = []
+      indexRho = []
+      sortedNumbers = [] // I did it.
+      Ang = []
+      K = []
+      centerX = []
+      centerY = []
+      arrayX = []
+      arrayY = []
+      T = []
+
       size = data.getRowCount()
       n = (size - 1) / 2
 
@@ -247,8 +274,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         const seq = p.ceil((i + 1) / 2) * p.pow((-1), (i + 2))
         K[i] = seq
       }
-
-      // print(K);
     }
 
     p.selectSketchMode = () => {
@@ -263,9 +288,36 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       }
     }
 
+    /* p.keyReleased = (e) => {
+      if (e.key === 'x') {
+
+      }
+    } */
+
     // Draw function
 
     p.draw = () => {
+      if (p.keyIsDown(88)) {
+        for (let i = 0; i < size; i++) {
+          if (data.getRowCount() < size) return
+          const xpos = data.getNum(i, 'x')
+          const ypos = data.getNum(i, 'y')
+          if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+            p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+            // remove point
+            data.removeRow(i)
+            /* const rows = [['x', 'y']]
+            for (i = 0; i < size - 1; i++) {
+              rows.push([data.getNum(i, 'x'), data.getNum(i, 'y')])
+            }
+            const csvContent = 'data:text/csv;charset=utf-8,' +
+              rows.map(e => e.join(',')).join('\n')
+            const encodedUri = encodeURI(csvContent) */
+            p.setSetup()
+            // setTimeout(() => launchSpirograph(encodedUri, parent, tracePath, canvasWidth, canvasHeight))
+          }
+        }
+      }
       p.background(0.1)
       p.translate(cam.world.x, cam.world.y)
       p.scale(cam.view.zoom)
@@ -284,12 +336,21 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       p.stroke(10, 130, 100)
       p.strokeJoin(p.ROUND)
       // p.beginShape()
-      p.colorMode(p.HSB)
       for (let i = 0; i < size; i++) {
+        if (data.getRowCount() < size) return
         const xpos = data.getNum(i, 'x')
         const ypos = data.getNum(i, 'y')
-        p.stroke(i / size, 1, 1)
+        // if (i === 0) console.log(p.mouseX, p.mouseY, xpos * cam.view.zoom + cam.world.x, ypos * cam.view.zoom + cam.world.y)
+        if (
+          (p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+          p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+          p.colorMode(p.RGB)
+          p.stroke(255, 255, 255)
+        } else {
+          p.stroke(i / size, 1, 1)
+        }
         p.point(xpos, ypos)
+        p.colorMode(p.HSB)
       }
       // p.endShape(p.CLOSE)
       if (tracePath) {

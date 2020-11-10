@@ -37,7 +37,6 @@ class Cam {
 
   mousePressed (e) {
     this.viewPos.isDragging = true
-    console.log('AAAAA')
     this.viewPos.prevX = e.clientX
     this.viewPos.prevY = e.clientY
   }
