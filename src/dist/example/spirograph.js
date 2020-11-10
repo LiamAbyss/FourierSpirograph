@@ -55,9 +55,88 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let arrayX = []
   let arrayY = []
 
+  let aftermeshed = false
+
   const controls = {
     view: { x: 0, y: 0, zoom: 1 },
     viewPos: { prevX: null, prevY: null, isDragging: false }
+  }
+
+  const nearestPoint = (point, pointsTable) => {
+    if (pointsTable === undefined || pointsTable.length === 0) return
+    let currentDist = 0
+    let minDist = Infinity
+    let nearest = {
+      x: 0,
+      y: 0
+    }
+    for (let i = 0; i < pointsTable.length; i++) {
+      currentDist = Math.sqrt(Math.pow(point.x - pointsTable[i].x, 2) + Math.pow(point.y - pointsTable[i].y, 2))
+      if (currentDist < minDist) {
+        minDist = currentDist
+        nearest = pointsTable[i]
+      }
+    }
+    return nearest
+  }
+
+  const sortPointsInOrder = (data, first) => {
+    const newData = []
+    for (let i = 0; i < data.getRowCount(); i++) {
+      newData.push({
+        x: data.getNum(i, 'x'),
+        y: data.getNum(i, 'y')
+      })
+    }
+    if (first === undefined) first = newData[newData.length - 1]
+    const outlineCanvas = document.getElementById('outlineCanvas')
+    let orderedPoints = []
+
+    let remainingPoints = newData
+    let lastNearest = first
+    for (let i = 0; i < newData.length; i++) {
+      orderedPoints.push(lastNearest)
+      const buffer = remainingPoints
+      remainingPoints = []
+      for (let j = 0; j < buffer.length; j++) {
+        if (buffer[j].x !== lastNearest.x || buffer[j].y !== lastNearest.y) {
+          remainingPoints.push(buffer[j])
+        }
+      }
+      lastNearest = nearestPoint(lastNearest, remainingPoints)
+    }
+
+    const meshedOrderedPoints = []
+    if (!aftermeshed) {
+      const aftermeshSel = document.getElementById('aftermesh')
+      for (let i = 0; i < orderedPoints.length; i++) {
+      // AFTERMESH
+        if (i % aftermeshSel.value) {
+          orderedPoints[i] = undefined
+        }
+      }
+      aftermeshed = true
+
+      for (let i = 0; i < orderedPoints.length; i++) {
+        if (orderedPoints[i] !== undefined) {
+          orderedPoints[i].x = orderedPoints[i].x - outlineCanvas.width / 2
+          orderedPoints[i].y = orderedPoints[i].y - outlineCanvas.height / 2
+          meshedOrderedPoints.push(orderedPoints[i])
+        }
+      }
+      orderedPoints = meshedOrderedPoints
+      if (orderedPoints.length % 2 === 0 && orderedPoints.length) {
+        orderedPoints.length = orderedPoints.length - 1
+      }
+    }
+
+    data.clearRows()
+    for (let i = 0; i < orderedPoints.length; i++) {
+      const newRow = data.addRow()
+      newRow.setNum('x', orderedPoints[i].x)
+      newRow.setNum('y', orderedPoints[i].y)
+    }
+    return data
   }
 
   // eslint-disable-next-line new-cap
@@ -135,7 +214,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       // print(K);
     }
 
-    p.setSetup = () => {
+    p.setSetup = (first) => {
       path = []
       arrayCx = []
       arrayCy = []
@@ -157,6 +236,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       arrayX = []
       arrayY = []
       T = []
+
+      data = sortPointsInOrder(data, first)
 
       size = data.getRowCount()
       n = (size - 1) / 2
@@ -306,15 +387,21 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
             p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
             // remove point
             data.removeRow(i)
-            /* const rows = [['x', 'y']]
-            for (i = 0; i < size - 1; i++) {
-              rows.push([data.getNum(i, 'x'), data.getNum(i, 'y')])
-            }
-            const csvContent = 'data:text/csv;charset=utf-8,' +
-              rows.map(e => e.join(',')).join('\n')
-            const encodedUri = encodeURI(csvContent) */
             p.setSetup()
-            // setTimeout(() => launchSpirograph(encodedUri, parent, tracePath, canvasWidth, canvasHeight))
+          }
+        }
+      } else if (p.keyIsDown(70)) {
+        for (let i = 0; i < size; i++) {
+          if (data.getRowCount() < size) return
+          const xpos = data.getNum(i, 'x')
+          const ypos = data.getNum(i, 'y')
+          if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+            p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+            // set first point
+            p.setSetup({
+              x: xpos,
+              y: ypos
+            })
           }
         }
       }

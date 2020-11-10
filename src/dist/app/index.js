@@ -5,7 +5,6 @@ let predefinedComputedOutlines = []
 let computeSize = -1
 let outlineResults
 let premeshSel
-let aftermeshSel
 
 const getThresholdsFromCsv = (thresholdFile) => {
   const res = []
@@ -35,112 +34,6 @@ const getText = (url) => {
 }
 getText('../dist/app/autoThresholds.csv')
 
-const nearestPoint = (point, pointsTable) => {
-  if (pointsTable === undefined || pointsTable.length === 0) return
-  let currentDist = 0
-  let minDist = Infinity
-  let nearest = {
-    x: 0,
-    y: 0
-  }
-  for (let i = 0; i < pointsTable.length; i++) {
-    currentDist = Math.sqrt(Math.pow(point.x - pointsTable[i].x, 2) + Math.pow(point.y - pointsTable[i].y, 2))
-    if (currentDist < minDist) {
-      minDist = currentDist
-      nearest = pointsTable[i]
-    }
-  }
-  return nearest
-}
-
-const sortPointsInOrder = (data, margin) => {
-  const newData = []
-  let orderedPoints = []
-  for (let i = 0; i < data.length; i += 4) {
-    if (data[i] && data[i + 1] && data[i + 2]) {
-      if (((i / 4) % window.appData.width > margin && (i / 4) % window.appData.width < outlineCanvas.width - margin) &&
-      (Math.floor(i / window.appData.width / 4) > margin && Math.floor(i / window.appData.width / 4) < outlineCanvas.height - margin)) {
-        newData.push({
-          x: (i / 4) % window.appData.width,
-          y: Math.floor(i / window.appData.width / 4)
-        })
-      }
-    }
-  }
-  let remainingPoints = newData
-  let lastNearest = newData[newData.length - 1]
-  // let lastNearest = newData[Math.floor(newData.length / 2)]
-  for (let i = 0; i < newData.length; i++) {
-    orderedPoints.push(lastNearest)
-    const buffer = remainingPoints
-    remainingPoints = []
-    for (let j = 0; j < buffer.length; j++) {
-      if (buffer[j].x !== lastNearest.x || buffer[j].y !== lastNearest.y) {
-        remainingPoints.push(buffer[j])
-      }
-    }
-    lastNearest = nearestPoint(lastNearest, remainingPoints)
-  }
-
-  for (let i = 0; i < orderedPoints.length; i++) {
-    // AFTERMESH
-    if (i % aftermeshSel.value) {
-      orderedPoints[i] = undefined
-    }
-  }
-
-  const meshedOrderedPoints = []
-  for (let i = 0; i < orderedPoints.length; i++) {
-    if (orderedPoints[i] !== undefined) {
-      orderedPoints[i].x = orderedPoints[i].x - outlineCanvas.width / 2
-      orderedPoints[i].y = orderedPoints[i].y - outlineCanvas.height / 2
-      meshedOrderedPoints.push(orderedPoints[i])
-    }
-  }
-  orderedPoints = meshedOrderedPoints
-  if (orderedPoints.length % 2 === 0 && orderedPoints.length) {
-    orderedPoints.length = orderedPoints.length - 1
-  }
-  console.log(window.appData)
-  let toLog = 'x,y\n'
-  for (let i = 0; i < orderedPoints.length; i++) {
-    toLog += (orderedPoints[i].x - outlineCanvas.width / 2) + ',' + (orderedPoints[i].y - outlineCanvas.height / 2) + '\n'
-  }
-  console.log(toLog)
-
-  for (let i = 0; i < data.length; i += 4) {
-    data[i] = 0
-    data[i + 1] = 0
-    data[i + 2] = 0
-    data[i + 3] = 255
-  }
-
-  outlineCanvas
-    .getContext('2d')
-    .putImageData(
-      new ImageData(new Uint8ClampedArray(
-        data),
-      window.appData.width, window.appData.height),
-      0,
-      0)
-  for (let i = 0; i < orderedPoints.length; i++) {
-    const tmp = 4 * (window.appData.width * orderedPoints[i].y + orderedPoints[i].x)
-    data[tmp] = i % 255
-    data[tmp + 1] = 255
-    data[tmp + 2] = 0
-    data[tmp + 3] = 255
-  }
-  outlineCanvas
-    .getContext('2d')
-    .putImageData(
-      new ImageData(new Uint8ClampedArray(
-        data),
-      window.appData.width, window.appData.height),
-      0,
-      0)
-  return orderedPoints
-}
-
 const meshOutlinePixels = (data, margin) => {
   if (data === undefined || data.length === 0) return
   let cpt = 0
@@ -155,19 +48,23 @@ const meshOutlinePixels = (data, margin) => {
     }
     cpt++
   }
-  outlineCanvas
-    .getContext('2d')
-    .putImageData(
-      new ImageData(new Uint8ClampedArray(
-        data),
-      window.appData.width, window.appData.height),
-      0,
-      0)
 
-  const orderedPoints = sortPointsInOrder(data, margin)
-  if (orderedPoints.length === 0) return
+  const newData = []
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] && data[i + 1] && data[i + 2]) {
+      if (((i / 4) % window.appData.width > margin && (i / 4) % window.appData.width < outlineCanvas.width - margin) &&
+      (Math.floor(i / window.appData.width / 4) > margin && Math.floor(i / window.appData.width / 4) < outlineCanvas.height - margin)) {
+        newData.push({
+          x: (i / 4) % window.appData.width,
+          y: Math.floor(i / window.appData.width / 4)
+        })
+      }
+    }
+  }
+
+  if (newData.length === 0) return
   const rows = [['x', 'y']]
-  orderedPoints.forEach(e => {
+  newData.forEach(e => {
     rows.push([e.x, e.y])
   })
   const csvContent = 'data:text/csv;charset=utf-8,' +
@@ -182,7 +79,6 @@ window.onload = () => {
   // When an image is loaded
   outlineResults = document.getElementById('outlineResults')
   premeshSel = document.getElementById('premesh')
-  aftermeshSel = document.getElementById('aftermesh')
   const fileInput = document.getElementById('uploadImage')
   const outlineCanvas = document.getElementById('outlineCanvas')
   const marginInput = document.getElementById('imageMargin')
