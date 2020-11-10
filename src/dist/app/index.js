@@ -70,7 +70,7 @@ const meshOutlinePixels = (data, margin) => {
   const csvContent = 'data:text/csv;charset=utf-8,' +
     rows.map(e => e.join(',')).join('\n')
   const encodedUri = encodeURI(csvContent)
-  launchSpirograph(encodedUri, 'outlineResults', true, outlineResults.offsetWidth - 50, outlineResults.offsetHeight - 50)
+  launchSpirograph(encodedUri, 'outlineResults', true, outlineResults.offsetWidth - 100, outlineResults.offsetHeight - 100)
 
   return data
 }
