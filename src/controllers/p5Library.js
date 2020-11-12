@@ -5,6 +5,11 @@ exports.sendExampleHtml = (req, res) => {
   res.sendFile(path.resolve('./src/dist/example/index.html'))
 }
 
+exports.sendCamJs = (req, res) => {
+  res.status(200)
+  res.sendFile(path.resolve('./src/dist/example/Cam.js'))
+}
+
 exports.sendSpirographJs = (req, res) => {
   res.status(200)
   res.sendFile(path.resolve('./src/dist/example/spirograph.js'))
@@ -12,5 +17,6 @@ exports.sendSpirographJs = (req, res) => {
 
 exports.sendSpirographData = (req, res) => {
   res.status(200)
+  res.header('Access-Control-Allow-Origin', '*')
   res.sendFile(path.resolve('./src/dist/example/datapts.csv'))
 }

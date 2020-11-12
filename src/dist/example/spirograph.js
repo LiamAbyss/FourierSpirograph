@@ -3,140 +3,401 @@
 
 let s
 
-const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => {
-  if (s !== undefined) {
-    s.remove()
-  }
-  let data
+/**
+ *
+ *
+ */
 
-  let path = []
+const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => {
+  let data // list of points, dataset
+  let size // number of points in the dataset
+  let n // = (size - 1)/2
+
+  let path = [] // path of the spirograph
 
   let angle // This number traces the curve
 
-  let size // = Length(listP)
-  let n // = (size - 1)/2
+  let T = []
 
-  const T = []
+  let kMax // Number max of orbits
 
-  let kMax // Number of orbits = 2*kMax
-
-  let arrayCx = []
   const arrayC0x = []
+  let arrayCx = []
   let arrayCy = []
   let tempCx = []
   let tempCy = []
+  // Fourier's coeff
   let Cx
   let Cy
 
-  const CPosX = []
-  const CPosY = []
-  const CNegX = []
-  const CNegY = []
+  let CPosX = []
+  let CPosY = []
+  let CNegX = []
+  let CNegY = []
 
-  const CCordX = []
-  const CCordY = []
+  let CCordX = []
+  let CCordY = []
 
-  const Rho = []
+  let Rho = []
   let indexRho = []
-  const sortedNumbers = [] // I did it.
+  let sortedNumbers = [] // I did it.
 
-  const Ang = []
+  let Ang = []
 
-  const K = []
+  let K = []
 
   let sel
+  let exportButton
+  let importButton
   let show = true
   const offset = 350
 
+  let centerX = []
+  let centerY = []
+  let sumaX
+  let sumaY
+  let arrayX = []
+  let arrayY = []
+
+  let aftermeshed = false
+
+  let manualPath = []
+
+  let follow = false
+  let nCircles
+
+  const controls = {
+    view: { x: 0, y: 0, zoom: 1 },
+    viewPos: { prevX: null, prevY: null, isDragging: false }
+  }
+
+  const distance = (a, b) => {
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
+  }
+
+  const sortDataFromManualPath = (data, path) => {
+    const orderedPoints = []
+    const newData = []
+    for (let i = 0; i < data.getRowCount(); i++) {
+      newData.push({
+        x: data.getNum(i, 'x'),
+        y: data.getNum(i, 'y')
+      })
+    }
+
+    const pairs = []
+    // Pair each point of data with the closest point of manual path
+    for (let i = 0; i < newData.length; i++) {
+      let minDist = Infinity
+      let point = {
+        x: 0,
+        y: 0
+      }
+      let currentDist = 0
+      for (let j = 0; j < path.length; j++) {
+        currentDist = distance(newData[i], path[j])
+        if (currentDist < minDist) {
+          minDist = currentDist
+          point = path[j]
+        }
+      }
+      pairs.push({
+        data: newData[i],
+        path: point
+      })
+    }
+
+    for (let i = 0; i < path.length; i++) {
+      const localOrder = []
+      for (let j = 0; j < pairs.length; j++) {
+        if (pairs[j].path === path[i]) {
+          localOrder.push(pairs[j])
+        }
+      }
+      localOrder.sort((a, b) => {
+        if (distance(a.data, a.path) < distance(b.data, b.path)) {
+          return -1
+        } else return 1
+      })
+
+      for (let j = 0; j < localOrder.length; j++) {
+        orderedPoints.push(localOrder[j].data)
+      }
+    }
+
+    data.clearRows()
+    for (let i = 0; i < orderedPoints.length; i++) {
+      const newRow = data.addRow()
+      newRow.setNum('x', orderedPoints[i].x)
+      newRow.setNum('y', orderedPoints[i].y)
+    }
+    return data
+  }
+
+  const nearestPoint = (point, pointsTable) => {
+    if (pointsTable === undefined || pointsTable.length === 0) return
+    let currentDist = 0
+    let minDist = Infinity
+    let nearest = {
+      x: 0,
+      y: 0
+    }
+    for (let i = 0; i < pointsTable.length; i++) {
+      currentDist = distance(point, pointsTable[i])
+      if (currentDist < minDist) {
+        minDist = currentDist
+        nearest = pointsTable[i]
+      }
+    }
+    return nearest
+  }
+
+  const sortPointsInOrder = (data, first) => {
+    const newData = []
+    for (let i = 0; i < data.getRowCount(); i++) {
+      newData.push({
+        x: data.getNum(i, 'x'),
+        y: data.getNum(i, 'y')
+      })
+    }
+    if (first === undefined) first = newData[newData.length - 1]
+    const outlineCanvas = document.getElementById('outlineCanvas')
+    let orderedPoints = []
+
+    let remainingPoints = newData
+    let lastNearest = first
+    for (let i = 0; i < newData.length; i++) {
+      orderedPoints.push(lastNearest)
+      const buffer = remainingPoints
+      remainingPoints = []
+      for (let j = 0; j < buffer.length; j++) {
+        if (buffer[j].x !== lastNearest.x || buffer[j].y !== lastNearest.y) {
+          remainingPoints.push(buffer[j])
+        }
+      }
+      lastNearest = nearestPoint(lastNearest, remainingPoints)
+    }
+
+    const meshedOrderedPoints = []
+    if (!aftermeshed) {
+      const aftermeshSel = document.getElementById('aftermesh')
+      for (let i = 0; i < orderedPoints.length; i++) {
+      // AFTERMESH
+        if (i % aftermeshSel.value) {
+          orderedPoints[i] = undefined
+        }
+      }
+      aftermeshed = true
+
+      for (let i = 0; i < orderedPoints.length; i++) {
+        if (orderedPoints[i] !== undefined) {
+          orderedPoints[i].x = orderedPoints[i].x - outlineCanvas.width / 2
+          orderedPoints[i].y = orderedPoints[i].y - outlineCanvas.height / 2
+          meshedOrderedPoints.push(orderedPoints[i])
+        }
+      }
+      orderedPoints = meshedOrderedPoints
+      if (orderedPoints.length % 2 === 0 && orderedPoints.length) {
+        orderedPoints.length = orderedPoints.length - 1
+      }
+    }
+
+    data.clearRows()
+    for (let i = 0; i < orderedPoints.length; i++) {
+      if (orderedPoints[i] === undefined) continue
+      const newRow = data.addRow()
+      newRow.setNum('x', orderedPoints[i].x)
+      newRow.setNum('y', orderedPoints[i].y)
+    }
+    return data
+  }
+
   // eslint-disable-next-line new-cap
-  s = new p5((sketch) => {
-  // preload table data
-    sketch.preload = () => {
+
+  if (s !== undefined) {
+    s.remove()
+  }
+  // eslint-disable-next-line new-cap
+  s = new p5((p) => {
+    // From https://github.com/nenadV91/p5_zoom
+
+    // preload table data
+    p.preload = () => {
       if (uri === undefined) {
         uri = '../dist/example/datapts.csv'
       }
-      data = sketch.loadTable(uri, 'csv', 'header')
+      data = p.loadTable(uri, 'csv', 'header')
     }
 
-    sketch.showXYTraces = (x, y) => {
+    p.showXYTraces = (x, y) => {
       const reversePath = [...path].reverse()
-      sketch.strokeWeight(1)
-      sketch.translate(offset, 0)
-      sketch.colorMode(sketch.RGB)
-      sketch.stroke(0, 255, 0)
-      sketch.beginShape()
+      p.strokeWeight(1)
+      p.translate(offset, 0)
+      p.colorMode(p.RGB)
+      p.stroke(0, 255, 0)
+      p.beginShape()
       for (let i = 0; i < reversePath.length; i++) {
-        sketch.vertex(i, -reversePath[i].y)
+        p.vertex(i, -reversePath[i].y)
       }
-      sketch.endShape()
-      sketch.stroke(255, 50)
-      sketch.line(x - offset, -y, reversePath[0].x - x, -reversePath[0].y)
+      p.endShape()
+      p.stroke(255, 50)
+      p.line(x - offset, -y, reversePath[0].x - x, -reversePath[0].y)
 
-      sketch.translate(-offset, 0)
+      p.translate(-offset, 0)
 
-      sketch.translate(0, offset)
+      p.translate(0, offset)
 
-      sketch.stroke(0, 255, 0)
-      sketch.beginShape()
+      p.stroke(0, 255, 0)
+      p.beginShape()
       for (let i = 0; i < reversePath.length; i++) {
-        sketch.vertex(reversePath[i].x, i)
+        p.vertex(reversePath[i].x, i)
       }
-      sketch.endShape()
+      p.endShape()
 
-      sketch.stroke(255, 50)
-      sketch.line(x, -(y + offset), reversePath[0].x, reversePath[0].y - y)
+      p.stroke(255, 50)
+      p.line(x, -(y + offset), reversePath[0].x, reversePath[0].y - y)
 
-      sketch.translate(0, -offset)
-      sketch.colorMode(sketch.HSB)
+      p.translate(0, -offset)
+      p.colorMode(p.HSB)
     }
 
-    sketch.setup = () => {
-      const canvas = sketch.createCanvas(canvasWidth, canvasHeight).parent(parent)
+    p.setup = () => {
+      const canvas = p.createCanvas(canvasWidth, canvasHeight).parent(parent)
       canvas.id('sketchCanvas')
-      sketch.colorMode(sketch.HSB, 1, 1, 1)
-      sketch.background(1)
+      p.colorMode(p.HSB, 1, 1, 1)
+      p.background(1)
 
-      sel = sketch.createSelect().parent(parent)
+      sel = p.createSelect().parent(parent)
       sel.id('sketchModeSelector')
       sel.option('Epicycles')
       sel.option('Approx. Curve')
-      sel.changed(sketch.mySelectEvent)
+      sel.changed(p.selectSketchMode)
 
-      nCircles = sketch.createSlider(1, n, 1).parent(parent)
-      nCircles.id('nCirclesSlider')
-      nCircles.changed(() => {
-        sketch.clear()
+      exportButton = p.createButton('Export').parent(parent)
+      exportButton.mousePressed(e => {
+        const newData = []
+        for (let i = 0; i < data.getRowCount(); i++) {
+          newData.push({
+            x: data.getNum(i, 'x'),
+            y: data.getNum(i, 'y')
+          })
+        }
+
+        const rows = [['x', 'y']]
+        newData.forEach(e => {
+          rows.push([e.x, e.y])
+        })
+        const csvContent = 'data:text/csv;charset=utf-8,' +
+          rows.map(e => e.join(',')).join('\n')
+        const encodedUri = encodeURI(csvContent)
+        window.location = encodedUri
       })
 
-      angle = sketch.PI / 3
+      importButton = p.createButton('Import').parent(parent)
+      const importFileInput = p.createFileInput((file) => {
+        const newData = p.loadTable(file.data, 'csv', 'header', () => {
+          if (file.name.endsWith('.csv')) {
+            p.setSetup(true, undefined, newData)
+          } else {
+            alert('The selected file doesn\'t have the correct extension\n' +
+              'Given extension : .' + file.name.split('.')[1] + '\n' +
+              'Expected extension : .csv or similar')
+          }
+        })
+      }).parent(importButton)
+      importFileInput.id('importButton')
+      importFileInput.hide()
+      importButton.mouseReleased(e => {
+        document.getElementById('importButton').click()
+      })
+
+      followCheckbox = p.createCheckbox('Follow path', false).parent(parent)
+      followCheckbox.id('followCheckbox')
+      followCheckbox.changed(() => {
+        follow = !follow
+      })
+
+      cam = new Cam(p.width / 2, p.height / 2)
+
+      canvas.mouseWheel(e => cam.zoom(e, p))
+      document.getElementById('sketchCanvas').addEventListener('mousedown', (e) => cam.mousePressed(e))
+      document.getElementById('sketchCanvas').addEventListener('mousemove', (e) => cam.mouseDragged(e, p))
+      document.getElementById('sketchCanvas').addEventListener('mouseup', (e) => cam.mouseReleased(e))
+
+      angle = p.PI / 3
+
+      p.setSetup()
+      // print(K);
+    }
+
+    p.setSetup = (sort, first, newData) => {
+      if (sort === undefined) sort = true
+      if (newData === undefined) newData = data
+      data = newData
+      path = []
+      arrayCx = []
+      arrayCy = []
+      tempCx = []
+      tempCy = []
+      CPosX = []
+      CPosY = []
+      CNegX = []
+      CNegY = []
+      CCordX = []
+      CCordY = []
+      Rho = []
+      indexRho = []
+      sortedNumbers = [] // I did it.
+      Ang = []
+      K = []
+      centerX = []
+      centerY = []
+      arrayX = []
+      arrayY = []
+      T = []
+
+      if (sort) {
+        data = sortPointsInOrder(data, first)
+      }
+
       size = data.getRowCount()
       n = (size - 1) / 2
 
-      for (let i = 0; i < size; i++) {
-        T[i] = 2 * sketch.PI * i / size
+      if (nCircles !== undefined) {
+        nCircles.remove()
       }
-      // ((sketch.cos(k Element(listT, l)) x(Element(listP, l)) + sketch.sin(k Element(listT, l)) y(Element(listP, l))) / size,
-      // (sketch.cos(k Element(listT, l)) y(Element(listP, l)) - sketch.sin(k Element(listT, l)) x(Element(listP, l))) / size), l, 1, size
 
-      arrayCx = sketch.make2Darray(size, size) // Check later the num of row and columns
-      arrayCy = sketch.make2Darray(size, size)
+      nCircles = p.createSlider(1, n, 1).parent(parent)
+      nCircles.id('nCirclesSlider')
+      nCircles.changed(() => {
+        p.clear()
+      })
+
+      for (let i = 0; i < size; i++) {
+        T[i] = 2 * p.PI * i / size
+      }
+      // ((p.cos(k Element(listT, l)) x(Element(listP, l)) + p.sin(k Element(listT, l)) y(Element(listP, l))) / size,
+      // (p.cos(k Element(listT, l)) y(Element(listP, l)) - p.sin(k Element(listT, l)) x(Element(listP, l))) / size), l, 1, size
+
+      arrayCx = p.make2Darray(size, size) // Check later the num of row and columns
+      arrayCy = p.make2Darray(size, size)
       for (var i = 0; i < size; i++) {
         for (var j = 0; j < size; j++) {
           const scale = 1
-          const COSX = sketch.cos((j - n) * T[i]) * scale * data.getNum(i, 'x')
-          const SINX = sketch.sin((j - n) * T[i]) * scale * data.getNum(i, 'y')
+          const COSX = p.cos((j - n) * T[i]) * scale * data.getNum(i, 'x')
+          const SINX = p.sin((j - n) * T[i]) * scale * data.getNum(i, 'y')
           const valX = 1 / size * (COSX + SINX)
           arrayCx[i][j] = valX
-          const COSY = sketch.cos((j - n) * T[i]) * scale * data.getNum(i, 'y')
-          const SINY = sketch.sin((j - n) * T[i]) * scale * data.getNum(i, 'x')
+          const COSY = p.cos((j - n) * T[i]) * scale * data.getNum(i, 'y')
+          const SINY = p.sin((j - n) * T[i]) * scale * data.getNum(i, 'x')
           const valY = 1 / size * (COSY - SINY)
           arrayCy[i][j] = valY
         }
       }
 
       // Maybe I don't need this 2d array. I'll check it later
-      tempCx = sketch.make2Darray(size, 2 * n + 1)
-      tempCy = sketch.make2Darray(size, 2 * n + 1)
+      tempCx = p.make2Darray(size, 2 * n + 1)
+      tempCy = p.make2Darray(size, 2 * n + 1)
       for (var ik = 0; ik < size; ik++) {
         for (var jk = 0; jk < 2 * n + 1; jk++) {
           tempCx[ik][jk] = arrayCx[ik][jk]
@@ -146,8 +407,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
       // print(tempCx)
 
-      Cx = sketch.arrayColumnsSum(tempCx)
-      Cy = sketch.arrayColumnsSum(tempCy)
+      Cx = p.arrayColumnsSum(tempCx)
+      Cy = p.arrayColumnsSum(tempCy)
 
       // print(Cx);
 
@@ -161,15 +422,15 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         CNegY[i] = Cy[i]
       }
 
-      sketch.reverse(CNegX)
-      sketch.reverse(CNegY)
+      p.reverse(CNegX)
+      p.reverse(CNegY)
       // print(CPosX.length);
       // print(CPosX);
       // print(CNegX);
       // print(CNegY);
 
       for (i = 0; i < 2 * n; i++) {
-        const cond = sketch.floor(i / 2)
+        const cond = p.floor(i / 2)
         if (i % 2 === 0) {
           CCordX[i] = CPosX[cond] // even
           CCordY[i] = CPosY[cond]
@@ -184,18 +445,18 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       // print(CCordY);
 
       for (i = 0; i < size - 1; i++) {
-        Rho[i] = sketch.dist(0, 0, CCordX[i], CCordY[i])
-        if (sketch.atan2(CCordY[i], CCordX[i]) < 0) {
-          Ang[i] = (sketch.atan2(CCordY[i], CCordX[i]) + 2 * sketch.PI) * 180 / (sketch.PI) // (PI - sketch.atan2(CCordY[i], CCordX[i]) )/(2*PI);
+        Rho[i] = p.dist(0, 0, CCordX[i], CCordY[i])
+        if (p.atan2(CCordY[i], CCordX[i]) < 0) {
+          Ang[i] = (p.atan2(CCordY[i], CCordX[i]) + 2 * p.PI) * 180 / (p.PI) // (PI - p.atan2(CCordY[i], CCordX[i]) )/(2*PI);
         } else {
-          Ang[i] = sketch.atan2(CCordY[i], CCordX[i]) * 180 / (sketch.PI)
+          Ang[i] = p.atan2(CCordY[i], CCordX[i]) * 180 / (p.PI)
         }
       }
 
       // I need to create a list of numbers so I can choose
       // the order of the epicycles by the size of the radii
       // from greater to smaller.
-      indexRho = sketch.make2Darray(size - 1, 2)
+      indexRho = p.make2Darray(size - 1, 2)
       for (var ir = 0; ir < size - 1; ir++) {
         for (var jr = 0; jr < 2; jr++) {
           if (jr === 1) {
@@ -207,11 +468,11 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       }
 
       for (let k = 0; k < size - 1; k++) {
-        sortedNumbers[k] = indexRho.sort(sketch.sortFunction)[k][1]
+        sortedNumbers[k] = indexRho.sort(p.sortFunction)[k][1]
       }
 
-      sketch.reverse(sortedNumbers)
-      // print(indRho.sort(sketch.sortFunction));
+      p.reverse(sortedNumbers)
+      // print(indRho.sort(p.sortFunction));
       // print(sortedNumbers);
 
       // RhoSorted = Rho;
@@ -222,71 +483,174 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       // print(Ang);
 
       for (i = 0; i < 2 * n; i++) {
-        const seq = sketch.ceil((i + 1) / 2) * sketch.pow((-1), (i + 2))
+        const seq = p.ceil((i + 1) / 2) * p.pow((-1), (i + 2))
         K[i] = seq
       }
-
-      // print(K);
     }
 
-    sketch.mySelectEvent = () => {
+    p.selectSketchMode = () => {
       var item = sel.value()
       if (item === 'Epicycles') {
         show = true
-        angle = -sketch.PI
+        angle = -p.PI
         path = []
       } else {
         show = false
-        sketch.max = 0
+        p.max = 0
       }
     }
 
     // Draw function
+    p.draw = () => {
+      p.background(0.1)
+      p.translate(cam.world.x, cam.world.y)
+      p.scale(cam.view.zoom)
+      if (p.keyIsDown(65)) {
+        const pos = {
+          x: (p.mouseX - cam.world.x) / cam.view.zoom,
+          y: (p.mouseY - cam.world.y) / cam.view.zoom
+        }
+        const foundX = data.findRows(pos.x, 'x')
+        let found = false
 
-    // I need more arrays.
-    const centerX = []
-    const centerY = []
-    let sumaX
-    let sumaY
-    const arrayX = []
-    const arrayY = []
+        if (foundX.length) {
+          for (let i = 0; i < foundX.length; i++) {
+            const foundY = foundX[i].getNum('y')
+            if (foundY === pos.y) {
+              found = true
+              break
+            }
+          }
+        }
+        if (!found) {
+          const newRow = data.addRow()
+          newRow.setNum('x', pos.x)
+          newRow.setNum('y', pos.y)
+          p.setSetup()
+        }
+      } else if (p.keyIsDown(88)) {
+        const pos = {
+          x: (p.mouseX - cam.world.x) / cam.view.zoom,
+          y: (p.mouseY - cam.world.y) / cam.view.zoom
+        }
+        const selectedRows = []
+        const weight = 20 / cam.view.zoom
+        for (let i = 0; i < size; i++) {
+          if (size > data.getRowCount()) return
+          const xpos = data.getNum(i, 'x')
+          const ypos = data.getNum(i, 'y')
+          if (pos.x >= xpos - (weight + 2) / 2 && pos.x <= xpos + (weight + 2) / 2 &&
+            pos.y >= ypos - (weight + 2) / 2 && pos.y <= ypos + (weight + 2) / 2) {
+            selectedRows.push(i)
+          }
+        }
 
-    sketch.draw = () => {
-      sketch.background(0.1)
-      sketch.translate(sketch.width / 2, sketch.height / 2)
-      // scale(0.7);
+        if (selectedRows.length && data.getRowCount() > selectedRows.length) {
+          const newData = new p5.Table()
+          newData.addColumn('x')
+          newData.addColumn('y')
+          for (let i = 0; i < size; i++) {
+            if (!selectedRows.includes(i)) {
+              const newRow = newData.addRow()
+              newRow.setNum('x', data.getNum(i, 'x'))
+              newRow.setNum('y', data.getNum(i, 'y'))
+            }
+          }
+          data = newData
+          p.setSetup()
+        }
+
+        p.colorMode(p.RGB)
+        p.stroke(255, 255, 255, 100)
+        p.fill(p.color(255, 255, 255, 100))
+        p.ellipse(pos.x, pos.y, weight)
+        p.noFill()
+        p.strokeWeight(2)
+      } else if (p.keyIsDown(70)) {
+        for (let i = 0; i < size; i++) {
+          if (data.getRowCount() < size) return
+          const xpos = data.getNum(i, 'x')
+          const ypos = data.getNum(i, 'y')
+          if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+            p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+            // set first point
+            p.setSetup(true, {
+              x: xpos,
+              y: ypos
+            })
+          }
+        }
+      } else if (p.keyIsDown(80)) {
+        // trace manual path
+        const pos = {
+          x: (p.mouseX - cam.world.x) / cam.view.zoom,
+          y: (p.mouseY - cam.world.y) / cam.view.zoom
+        }
+        if (manualPath.length === 0) console.log('Tracing path...')
+        if (manualPath.length === 0 || distance(pos, manualPath[manualPath.length - 1]) > 1) {
+          manualPath.push(pos)
+        }
+
+        if (manualPath.length > 0) {
+          p.colorMode(p.RGB)
+          p.stroke(255, 255, 255, 100)
+          p.strokeWeight(5)
+          p.noFill()
+          p.beginShape()
+          for (let i = 0; i < manualPath.length; i++) {
+            p.vertex(manualPath[i].x, manualPath[i].y)
+          }
+          p.endShape()
+          p.strokeWeight(2)
+        }
+      } else if (manualPath.length > 0) {
+        // resolve manual path
+        data = sortDataFromManualPath(data, manualPath)
+        p.setSetup(false)
+        manualPath = []
+        console.log('Finished tracing path')
+      }
 
       if (nCircles.value() !== kMax) {
         path = []
-        sketch.background(0.1)
+        p.background(0.1)
       }
 
       kMax = nCircles.value()
 
       // Polygonal curve:
       // Uncomment if you want to see it.
-      sketch.noFill()
-      sketch.stroke(10, 130, 100)
-      sketch.strokeJoin(sketch.ROUND)
-      // sketch.beginShape()
-      sketch.colorMode(sketch.HSB)
+      p.noFill()
+      p.stroke(10, 130, 100)
+      p.strokeJoin(p.ROUND)
+      // p.beginShape()
       for (let i = 0; i < size; i++) {
+        if (data.getRowCount() < size) return
         const xpos = data.getNum(i, 'x')
         const ypos = data.getNum(i, 'y')
-        sketch.stroke(i / size, 1, 1)
-        sketch.point(xpos, ypos)
+        // if (i === 0) console.log(p.mouseX, p.mouseY, xpos * cam.view.zoom + cam.world.x, ypos * cam.view.zoom + cam.world.y)
+        if (
+          (p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+          p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+          p.colorMode(p.RGB)
+          p.stroke(255, 255, 255)
+        } else {
+          p.stroke(i / size, 1, 1)
+        }
+        p.point(xpos, ypos)
+        p.colorMode(p.HSB)
       }
-      // sketch.endShape(sketch.CLOSE)
+      // p.endShape(p.CLOSE)
       if (tracePath) {
         if (show === true) { // If 'show' is true, then draw epicycles.
         // The initial circle
           centerX[0] = Cx[(size + 1) / 2 - 1]
           centerY[0] = Cy[(size + 1) / 2 - 1]
-          // sketch.stroke(1 / centerX.length, 1, 1)
-          // sketch.strokeWeight(2)
-          sketch.stroke(255, 50)
-          sketch.strokeWeight(1)
-          sketch.ellipse(centerX[0], centerY[0], 2 * Rho[sortedNumbers[0] - 1])
+          // p.stroke(1 / centerX.length, 1, 1)
+          // p.strokeWeight(2)
+          p.stroke(255, 50)
+          p.strokeWeight(1)
+          p.ellipse(centerX[0], centerY[0], 2 * Rho[sortedNumbers[0] - 1])
 
           // I need the centers for the rest of the epicycles.
           // eslint-disable-next-line no-unmodified-loop-condition
@@ -295,8 +659,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
             sumaY = centerY[0]
             let i = 0
             while (i <= k - 1) {
-              sumaX += Rho[sortedNumbers[i] - 1] * sketch.cos(Ang[sortedNumbers[i] - 1] * sketch.PI / 180 + angle * K[sortedNumbers[i] - 1])
-              sumaY += Rho[sortedNumbers[i] - 1] * sketch.sin(Ang[sortedNumbers[i] - 1] * sketch.PI / 180 + angle * K[sortedNumbers[i] - 1])
+              sumaX += Rho[sortedNumbers[i] - 1] * p.cos(Ang[sortedNumbers[i] - 1] * p.PI / 180 + angle * K[sortedNumbers[i] - 1])
+              sumaY += Rho[sortedNumbers[i] - 1] * p.sin(Ang[sortedNumbers[i] - 1] * p.PI / 180 + angle * K[sortedNumbers[i] - 1])
 
               i++
             }
@@ -317,35 +681,39 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
           // The rest of the epicycles.
           for (let i = 1; i < kMax; i++) {
             // HSV Colors
-            // sketch.stroke(4 * i / (centerX.length), 1, 1)
-            // sketch.strokeWeight(2)
-            sketch.stroke(255, 50)
-            sketch.strokeWeight(1)
-            sketch.ellipse(centerX[i], centerY[i], 2 * Rho[sortedNumbers[i] - 1])
+            // p.stroke(4 * i / (centerX.length), 1, 1)
+            // p.strokeWeight(2)
+            p.stroke(255, 50)
+            p.strokeWeight(1)
+            p.ellipse(centerX[i], centerY[i], 2 * Rho[sortedNumbers[i] - 1])
           }
 
           // The radii connecting the epicycles.
-          sketch.strokeWeight(0.5)
-          sketch.stroke(0.8)
+          p.strokeWeight(0.5)
+          p.stroke(0.8)
           for (let k = 0; k < kMax; k++) {
           // stroke((4*k ) / (2 * kMax), 1, 1);
-            sketch.line(centerX[k], centerY[k], centerX[k + 1], centerY[k + 1])
+            p.line(centerX[k], centerY[k], centerX[k + 1], centerY[k + 1])
           }
 
           // The path traced by the epicycles.
-          path.push(sketch.createVector(centerX[kMax], -centerY[kMax]))
-
-          sketch.showXYTraces(centerX[kMax], -centerY[kMax])
-
-          sketch.strokeJoin(sketch.ROUND)
-          sketch.stroke(1)
-          sketch.strokeWeight(2)
-          sketch.noFill()
-          sketch.beginShape()
-          for (var pos of path) {
-            sketch.vertex(pos.x, -pos.y)
+          path.push(p.createVector(centerX[kMax], -centerY[kMax]))
+          if (follow) {
+            cam.world.x = -centerX[kMax] * cam.view.zoom + cam.view.x + p.width / 2
+            cam.world.y = -centerY[kMax] * cam.view.zoom + cam.view.y + p.height / 2
           }
-          sketch.endShape()
+
+          p.showXYTraces(centerX[kMax], -centerY[kMax])
+
+          p.strokeJoin(p.ROUND)
+          p.stroke(1)
+          p.strokeWeight(2)
+          p.noFill()
+          p.beginShape()
+          for (var pos of path) {
+            p.vertex(pos.x, -pos.y)
+          }
+          p.endShape()
         } else {
         // If 'show' is false, then show the curve
         // approximated by adding terms in the
@@ -353,36 +721,40 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
           // // The approximation curve
 
-          sketch.strokeWeight(3)
-          sketch.stroke(1)
-          sketch.strokeJoin(sketch.ROUND)
-          sketch.noFill()
-          sketch.beginShape()
+          p.strokeWeight(3)
+          p.stroke(1)
+          p.strokeJoin(p.ROUND)
+          p.noFill()
+          p.beginShape()
           for (let k = -180; k < 180; k += 0.2) {
-            const vs = sketch.seriesF(CPosX, CPosY, CNegX, CNegY, sketch.radians(k), sketch.max)
+            const vs = p.seriesF(CPosX, CPosY, CNegX, CNegY, p.radians(k), p.max)
             // centerX[0], centerX[0],
-            sketch.vertex(centerX[0] + vs.x, (centerY[0] + vs.y))
+            p.vertex(centerX[0] + vs.x, (centerY[0] + vs.y))
           }
-          sketch.endShape(sketch.CLOSE)
-          sketch.textSize(17)
-          sketch.strokeWeight(0.8)
-          sketch.stroke(0)
-          sketch.fill(1)
-          sketch.text('n=' + sketch.round(sketch.max), -270, -270)
+          p.endShape(p.CLOSE)
+          p.textSize(17)
+          p.strokeWeight(0.8)
+          p.stroke(0)
+          p.fill(1)
+          p.text('n=' + p.round(p.max), -270, -270)
         }
       }
 
       angle -= 0.007
-      sketch.max += 0.2
+      p.max += 0.2
 
-      if (sketch.max > n) {
-        sketch.max = 1
+      if (path.length > 10000) {
+        path = []
+      }
+
+      if (p.max > n) {
+        p.max = 1
       }
     }
 
     // Other functions
 
-    sketch.make2Darray = (cols, rows) => {
+    p.make2Darray = (cols, rows) => {
       var arr = new Array(cols)
       for (var i = 0; i < arr.length; i++) {
         arr[i] = new Array(rows)
@@ -390,7 +762,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       return arr
     }
 
-    sketch.arrayColumnsSum = (array) => {
+    p.arrayColumnsSum = (array) => {
       if (array === undefined || array.length === 0) {
         s.remove()
         return
@@ -404,7 +776,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       )
     }
 
-    sketch.sortFunction = (a, b) => {
+    p.sortFunction = (a, b) => {
       if (a[0] === b[0]) {
         return 0
       } else {
@@ -412,16 +784,16 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       }
     }
 
-    sketch.seriesF = (list1, list2, list3, list4, angle, index) => {
+    p.seriesF = (list1, list2, list3, list4, angle, index) => {
       let sumX = 0
       let sumY = 0
       let i = 1
       while (i < index + 1) {
-        sumX += sketch.cos(i * angle) * list1[i - 1] - sketch.sin(i * angle) * list2[i - 1] + sketch.cos(-i * angle) * list3[i - 1] - sketch.sin(-i * angle) * list4[i - 1]
-        sumY += sketch.cos(i * angle) * list2[i - 1] + sketch.sin(i * angle) * list1[i - 1] + sketch.cos(-i * angle) * list4[i - 1] + sketch.sin(-i * angle) * list3[i - 1]
+        sumX += p.cos(i * angle) * list1[i - 1] - p.sin(i * angle) * list2[i - 1] + p.cos(-i * angle) * list3[i - 1] - p.sin(-i * angle) * list4[i - 1]
+        sumY += p.cos(i * angle) * list2[i - 1] + p.sin(i * angle) * list1[i - 1] + p.cos(-i * angle) * list4[i - 1] + p.sin(-i * angle) * list3[i - 1]
         i++
       }
-      return sketch.createVector(sumX, sumY)
+      return p.createVector(sumX, sumY)
     }
   })
 }
