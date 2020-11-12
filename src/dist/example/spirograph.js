@@ -201,6 +201,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
     data.clearRows()
     for (let i = 0; i < orderedPoints.length; i++) {
+      if (orderedPoints[i] === undefined) continue
       const newRow = data.addRow()
       newRow.setNum('x', orderedPoints[i].x)
       newRow.setNum('y', orderedPoints[i].y)
@@ -492,8 +493,30 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       p.background(0.1)
       p.translate(cam.world.x, cam.world.y)
       p.scale(cam.view.zoom)
+      if (p.keyIsDown(65)) {
+        const pos = {
+          x: (p.mouseX - cam.world.x) / cam.view.zoom,
+          y: (p.mouseY - cam.world.y) / cam.view.zoom
+        }
+        const foundX = data.findRows(pos.x, 'x')
+        let found = false
 
-      if (p.keyIsDown(88)) {
+        if (foundX.length) {
+          for (let i = 0; i < foundX.length; i++) {
+            const foundY = foundX[i].getNum('y')
+            if (foundY === pos.y) {
+              found = true
+              break
+            }
+          }
+        }
+        if (!found) {
+          const newRow = data.addRow()
+          newRow.setNum('x', pos.x)
+          newRow.setNum('y', pos.y)
+          p.setSetup()
+        }
+      } else if (p.keyIsDown(88)) {
         for (let i = 0; i < size; i++) {
           if (data.getRowCount() < size) return
           const xpos = data.getNum(i, 'x')

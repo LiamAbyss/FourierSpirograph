@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 class Cam {
   constructor (x, y) {
     // describes world center in relation to screen
