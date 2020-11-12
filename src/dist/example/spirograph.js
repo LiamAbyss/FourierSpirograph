@@ -3,28 +3,33 @@
 
 let s
 
-const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => {
-  if (s !== undefined) {
-    s.remove()
-  }
-  let data
+/**
+ * 
+ * 
+ */
 
-  let path = []
+const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => {
+  
+  let data //list of points, dataset
+  let size //number of points in the dataset
+  let n // = (size - 1)/2 
+
+  let path = [] //path of the spirograph 
 
   let angle // This number traces the curve
 
-  let size // = Length(listP)
-  let n // = (size - 1)/2
+//To Check
+  const T = [] //list of angles of every points in the dataset 
 
-  const T = []
+  let kMax // Number max of orbits
 
-  let kMax // Number of orbits = 2*kMax
-
+  //lists of Fourier's coeff
   let arrayCx = []
-  const arrayC0x = []
+  const arrayC0x = [] 
   let arrayCy = []
   let tempCx = []
   let tempCy = []
+  //Fourier's coeff
   let Cx
   let Cy
 
@@ -49,6 +54,10 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   const offset = 350
 
   // eslint-disable-next-line new-cap
+
+  if (s !== undefined) {
+    s.remove()
+  }
   s = new p5((p) => {
   // preload table data
     p.preload = () => {

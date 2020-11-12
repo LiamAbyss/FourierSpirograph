@@ -7,12 +7,14 @@ let outlineResults
 let premeshSel
 let aftermeshSel
 
+//gets predifined thresholds from a file and return them as a list
 const getThresholdsFromCsv = (thresholdFile) => {
   const res = []
   const lines = thresholdFile.split('\r\n')
   lines.forEach((line) => {
     if (line.search('ut') !== -1) return
     const buff = line.split(',')
+    //push upper and lower threshold is res
     res.push({
       lt: parseFloat(buff[0]),
       ut: parseFloat(buff[1])
@@ -21,6 +23,8 @@ const getThresholdsFromCsv = (thresholdFile) => {
   return res
 }
 
+//ATTENTION : noter qu'il faut peut etre changer le nom de la fonction ?
+//gets the text from a csv file to set the predefined thresholds
 const getText = (url) => {
   // read text from URL location
   var request = new XMLHttpRequest()
@@ -33,8 +37,10 @@ const getText = (url) => {
     }
   }
 }
+
 getText('../dist/app/autoThresholds.csv')
 
+//finds the nearest neighbour of a point from a table of points 
 const nearestPoint = (point, pointsTable) => {
   if (pointsTable === undefined || pointsTable.length === 0) return
   let currentDist = 0
@@ -43,19 +49,36 @@ const nearestPoint = (point, pointsTable) => {
     x: 0,
     y: 0
   }
+  //for each?
+  /**
+   * pointsTable.forEach((i) => {
+   *  currentDist = Math.sqrt(Math.pow(point.x - i.x, 2) + Math.pow(point.y - i.y, 2))
+   *  if (currentDist < minDist) {
+        minDist = currentDist
+        nearest = pointsTable[i]
+      }
+   * })
+   */
   for (let i = 0; i < pointsTable.length; i++) {
     currentDist = Math.sqrt(Math.pow(point.x - pointsTable[i].x, 2) + Math.pow(point.y - pointsTable[i].y, 2))
     if (currentDist < minDist) {
       minDist = currentDist
       nearest = pointsTable[i]
-    }
+    }newData
+    // FIRST METHOD
+  
   }
   return nearest
 }
 
+//returns a list of points so that every point is the nearest for the previous and the next point
+//smooths the lines by removing some points
 const sortPointsInOrder = (data, margin) => {
   const newData = []
   let orderedPoints = []
+
+  //remove some points to reduce the total number of points
+  //save one out of 4
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
       if (((i / 4) % window.appData.width > margin && (i / 4) % window.appData.width < outlineCanvas.width - margin) &&
@@ -67,6 +90,7 @@ const sortPointsInOrder = (data, margin) => {
       }
     }
   }
+
   let remainingPoints = newData
   // FIRST METHOD
 
@@ -75,15 +99,17 @@ const sortPointsInOrder = (data, margin) => {
     orderedPoints.push(lastNearest)
     const buffer = remainingPoints
     remainingPoints = []
+    //remove the last Nearest from the point list
     for (let j = 0; j < buffer.length; j++) {
       if (buffer[j].x !== lastNearest.x || buffer[j].y !== lastNearest.y) {
         remainingPoints.push(buffer[j])
       }
     }
+    //find the nearest point from current
     lastNearest = nearestPoint(lastNearest, remainingPoints)
   }
 
-  // SECOND METHOD
+  // SECOND METHOD THAT HAS TO BE REWORK BY LIAMABYSS
   /*
   const beginPoint = newData[0]
   const endPoint = nearestPoint(beginPoint, remainingPoints)
@@ -122,13 +148,13 @@ const sortPointsInOrder = (data, margin) => {
   }
   */
 
+  //remove some points
   for (let i = 0; i < orderedPoints.length; i++) {
     // AFTERMESH
     if (i % aftermeshSel.value) {
       orderedPoints[i] = undefined
     }
   }
-
   const meshedOrderedPoints = []
   for (let i = 0; i < orderedPoints.length; i++) {
     if (orderedPoints[i] !== undefined) {
@@ -138,9 +164,12 @@ const sortPointsInOrder = (data, margin) => {
     }
   }
   orderedPoints = meshedOrderedPoints
+
   if (orderedPoints.length % 2 === 0 && orderedPoints.length) {
     orderedPoints.length = orderedPoints.length - 1
   }
+
+  //don't know if I have to remove that
   console.log(window.appData)
   let toLog = 'x,y\n'
   for (let i = 0; i < orderedPoints.length; i++) {
@@ -148,13 +177,13 @@ const sortPointsInOrder = (data, margin) => {
   }
   console.log(toLog)
 
+  //ask Pauk et Mimi
   for (let i = 0; i < data.length; i += 4) {
     data[i] = 0
     data[i + 1] = 0
     data[i + 2] = 0
     data[i + 3] = 255
   }
-
   outlineCanvas
     .getContext('2d')
     .putImageData(
@@ -178,6 +207,7 @@ const sortPointsInOrder = (data, margin) => {
       window.appData.width, window.appData.height),
       0,
       0)
+    
   return orderedPoints
 }
 
@@ -185,6 +215,7 @@ const meshOutlinePixels = (data, margin) => {
   if (data === undefined || data.length === 0) return
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
+    //why not data[i+3] ?
     if (data[i] && data[i + 1] && data[i + 2]) {
       // PREMESH
       if (cpt % premeshSel.value !== 0) {
@@ -218,6 +249,8 @@ const meshOutlinePixels = (data, margin) => {
   return data
 }
 
+
+// 
 window.onload = () => {
   // When an image is loaded
   outlineResults = document.getElementById('outlineResults')
@@ -227,6 +260,7 @@ window.onload = () => {
   const outlineCanvas = document.getElementById('outlineCanvas')
   const marginInput = document.getElementById('imageMargin')
   let imgd
+
   function previewImage () {
     var oFReader = new FileReader()
     oFReader.readAsDataURL(fileInput.files[0])
