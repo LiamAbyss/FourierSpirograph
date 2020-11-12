@@ -16,41 +16,204 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let size // = Length(listP)
   let n // = (size - 1)/2
 
-  const T = []
+  let T = []
 
   let kMax // Number of orbits = 2*kMax
 
-  let arrayCx = []
   const arrayC0x = []
+  let arrayCx = []
   let arrayCy = []
   let tempCx = []
   let tempCy = []
   let Cx
   let Cy
 
-  const CPosX = []
-  const CPosY = []
-  const CNegX = []
-  const CNegY = []
+  let CPosX = []
+  let CPosY = []
+  let CNegX = []
+  let CNegY = []
 
-  const CCordX = []
-  const CCordY = []
+  let CCordX = []
+  let CCordY = []
 
-  const Rho = []
+  let Rho = []
   let indexRho = []
-  const sortedNumbers = [] // I did it.
+  let sortedNumbers = [] // I did it.
 
-  const Ang = []
+  let Ang = []
 
-  const K = []
+  let K = []
 
   let sel
+  let exportButton
+  let importButton
   let show = true
   const offset = 350
 
+  let centerX = []
+  let centerY = []
+  let sumaX
+  let sumaY
+  let arrayX = []
+  let arrayY = []
+
+  let aftermeshed = false
+
+  let manualPath = []
+
+  let follow = false
+
+  const controls = {
+    view: { x: 0, y: 0, zoom: 1 },
+    viewPos: { prevX: null, prevY: null, isDragging: false }
+  }
+
+  const distance = (a, b) => {
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
+  }
+
+  const sortDataFromManualPath = (data, path) => {
+    const orderedPoints = []
+    const newData = []
+    for (let i = 0; i < data.getRowCount(); i++) {
+      newData.push({
+        x: data.getNum(i, 'x'),
+        y: data.getNum(i, 'y')
+      })
+    }
+
+    const pairs = []
+    // Pair each point of data with the closest point of manual path
+    for (let i = 0; i < newData.length; i++) {
+      let minDist = Infinity
+      let point = {
+        x: 0,
+        y: 0
+      }
+      let currentDist = 0
+      for (let j = 0; j < path.length; j++) {
+        currentDist = distance(newData[i], path[j])
+        if (currentDist < minDist) {
+          minDist = currentDist
+          point = path[j]
+        }
+      }
+      pairs.push({
+        data: newData[i],
+        path: point
+      })
+    }
+
+    for (let i = 0; i < path.length; i++) {
+      const localOrder = []
+      for (let j = 0; j < pairs.length; j++) {
+        if (pairs[j].path === path[i]) {
+          localOrder.push(pairs[j])
+        }
+      }
+      localOrder.sort((a, b) => {
+        if (distance(a.data, a.path) < distance(b.data, b.path)) {
+          return -1
+        } else return 1
+      })
+
+      for (let j = 0; j < localOrder.length; j++) {
+        orderedPoints.push(localOrder[j].data)
+      }
+    }
+
+    data.clearRows()
+    for (let i = 0; i < orderedPoints.length; i++) {
+      const newRow = data.addRow()
+      newRow.setNum('x', orderedPoints[i].x)
+      newRow.setNum('y', orderedPoints[i].y)
+    }
+    return data
+  }
+
+  const nearestPoint = (point, pointsTable) => {
+    if (pointsTable === undefined || pointsTable.length === 0) return
+    let currentDist = 0
+    let minDist = Infinity
+    let nearest = {
+      x: 0,
+      y: 0
+    }
+    for (let i = 0; i < pointsTable.length; i++) {
+      currentDist = distance(point, pointsTable[i])
+      if (currentDist < minDist) {
+        minDist = currentDist
+        nearest = pointsTable[i]
+      }
+    }
+    return nearest
+  }
+
+  const sortPointsInOrder = (data, first) => {
+    const newData = []
+    for (let i = 0; i < data.getRowCount(); i++) {
+      newData.push({
+        x: data.getNum(i, 'x'),
+        y: data.getNum(i, 'y')
+      })
+    }
+    if (first === undefined) first = newData[newData.length - 1]
+    const outlineCanvas = document.getElementById('outlineCanvas')
+    let orderedPoints = []
+
+    let remainingPoints = newData
+    let lastNearest = first
+    for (let i = 0; i < newData.length; i++) {
+      orderedPoints.push(lastNearest)
+      const buffer = remainingPoints
+      remainingPoints = []
+      for (let j = 0; j < buffer.length; j++) {
+        if (buffer[j].x !== lastNearest.x || buffer[j].y !== lastNearest.y) {
+          remainingPoints.push(buffer[j])
+        }
+      }
+      lastNearest = nearestPoint(lastNearest, remainingPoints)
+    }
+
+    const meshedOrderedPoints = []
+    if (!aftermeshed) {
+      const aftermeshSel = document.getElementById('aftermesh')
+      for (let i = 0; i < orderedPoints.length; i++) {
+      // AFTERMESH
+        if (i % aftermeshSel.value) {
+          orderedPoints[i] = undefined
+        }
+      }
+      aftermeshed = true
+
+      for (let i = 0; i < orderedPoints.length; i++) {
+        if (orderedPoints[i] !== undefined) {
+          orderedPoints[i].x = orderedPoints[i].x - outlineCanvas.width / 2
+          orderedPoints[i].y = orderedPoints[i].y - outlineCanvas.height / 2
+          meshedOrderedPoints.push(orderedPoints[i])
+        }
+      }
+      orderedPoints = meshedOrderedPoints
+      if (orderedPoints.length % 2 === 0 && orderedPoints.length) {
+        orderedPoints.length = orderedPoints.length - 1
+      }
+    }
+
+    data.clearRows()
+    for (let i = 0; i < orderedPoints.length; i++) {
+      if (orderedPoints[i] === undefined) continue
+      const newRow = data.addRow()
+      newRow.setNum('x', orderedPoints[i].x)
+      newRow.setNum('y', orderedPoints[i].y)
+    }
+    return data
+  }
+
   // eslint-disable-next-line new-cap
   s = new p5((p) => {
-  // preload table data
+    // From https://github.com/nenadV91/p5_zoom
+
+    // preload table data
     p.preload = () => {
       if (uri === undefined) {
         uri = '../dist/example/datapts.csv'
@@ -102,13 +265,99 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       sel.option('Approx. Curve')
       sel.changed(p.selectSketchMode)
 
+      exportButton = p.createButton('Export').parent(parent)
+      exportButton.mousePressed(e => {
+        const newData = []
+        for (let i = 0; i < data.getRowCount(); i++) {
+          newData.push({
+            x: data.getNum(i, 'x'),
+            y: data.getNum(i, 'y')
+          })
+        }
+
+        const rows = [['x', 'y']]
+        newData.forEach(e => {
+          rows.push([e.x, e.y])
+        })
+        const csvContent = 'data:text/csv;charset=utf-8,' +
+          rows.map(e => e.join(',')).join('\n')
+        const encodedUri = encodeURI(csvContent)
+        window.location = encodedUri
+      })
+
+      importButton = p.createButton('Import').parent(parent)
+      const importFileInput = p.createFileInput((file) => {
+        const newData = p.loadTable(file.data, 'csv', 'header', () => {
+          if (file.name.endsWith('.csv')) {
+            p.setSetup(true, undefined, newData)
+          } else {
+            alert('The selected file doesn\'t have the correct extension\n' +
+              'Given extension : .' + file.name.split('.')[1] + '\n' +
+              'Expected extension : .csv or similar')
+          }
+        })
+      }).parent(importButton)
+      importFileInput.id('importButton')
+      importFileInput.hide()
+      importButton.mouseReleased(e => {
+        document.getElementById('importButton').click()
+      })
+
+      followCheckbox = p.createCheckbox('Follow path', false).parent(parent)
+      followCheckbox.id('followCheckbox')
+      followCheckbox.changed(() => {
+        follow = !follow
+      })
+
       nCircles = p.createSlider(1, n, 1).parent(parent)
       nCircles.id('nCirclesSlider')
       nCircles.changed(() => {
         p.clear()
       })
 
+      cam = new Cam(p.width / 2, p.height / 2)
+
+      canvas.mouseWheel(e => cam.zoom(e, p))
+      document.getElementById('sketchCanvas').addEventListener('mousedown', (e) => cam.mousePressed(e))
+      document.getElementById('sketchCanvas').addEventListener('mousemove', (e) => cam.mouseDragged(e, p))
+      document.getElementById('sketchCanvas').addEventListener('mouseup', (e) => cam.mouseReleased(e))
+
       angle = p.PI / 3
+
+      p.setSetup()
+      // print(K);
+    }
+
+    p.setSetup = (sort, first, newData) => {
+      if (sort === undefined) sort = true
+      if (newData === undefined) newData = data
+      data = newData
+      path = []
+      arrayCx = []
+      arrayCy = []
+      tempCx = []
+      tempCy = []
+      CPosX = []
+      CPosY = []
+      CNegX = []
+      CNegY = []
+      CCordX = []
+      CCordY = []
+      Rho = []
+      indexRho = []
+      sortedNumbers = [] // I did it.
+      Ang = []
+      K = []
+      centerX = []
+      centerY = []
+      arrayX = []
+      arrayY = []
+      T = []
+
+      if (sort) {
+        data = sortPointsInOrder(data, first)
+      }
+
       size = data.getRowCount()
       n = (size - 1) / 2
 
@@ -225,8 +474,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         const seq = p.ceil((i + 1) / 2) * p.pow((-1), (i + 2))
         K[i] = seq
       }
-
-      // print(K);
     }
 
     p.selectSketchMode = () => {
@@ -242,21 +489,89 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     }
 
     // Draw function
-
-    // I need more arrays.
-    const centerX = []
-    const centerY = []
-    let sumaX
-    let sumaY
-    const arrayX = []
-    const arrayY = []
-
     p.draw = () => {
       p.background(0.1)
-      p.translate(p.width / 2, p.height / 2)
-      // scale(0.7);
+      p.translate(cam.world.x, cam.world.y)
+      p.scale(cam.view.zoom)
+      if (p.keyIsDown(65)) {
+        const pos = {
+          x: (p.mouseX - cam.world.x) / cam.view.zoom,
+          y: (p.mouseY - cam.world.y) / cam.view.zoom
+        }
+        const foundX = data.findRows(pos.x, 'x')
+        let found = false
 
-      // p.scale(sf)
+        if (foundX.length) {
+          for (let i = 0; i < foundX.length; i++) {
+            const foundY = foundX[i].getNum('y')
+            if (foundY === pos.y) {
+              found = true
+              break
+            }
+          }
+        }
+        if (!found) {
+          const newRow = data.addRow()
+          newRow.setNum('x', pos.x)
+          newRow.setNum('y', pos.y)
+          p.setSetup()
+        }
+      } else if (p.keyIsDown(88)) {
+        for (let i = 0; i < size; i++) {
+          if (data.getRowCount() < size) return
+          const xpos = data.getNum(i, 'x')
+          const ypos = data.getNum(i, 'y')
+          if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+            p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+            // remove point
+            data.removeRow(i)
+            p.setSetup()
+          }
+        }
+      } else if (p.keyIsDown(70)) {
+        for (let i = 0; i < size; i++) {
+          if (data.getRowCount() < size) return
+          const xpos = data.getNum(i, 'x')
+          const ypos = data.getNum(i, 'y')
+          if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+            p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+            // set first point
+            p.setSetup(true, {
+              x: xpos,
+              y: ypos
+            })
+          }
+        }
+      } else if (p.keyIsDown(80)) {
+        // trace manual path
+        const pos = {
+          x: (p.mouseX - cam.world.x) / cam.view.zoom,
+          y: (p.mouseY - cam.world.y) / cam.view.zoom
+        }
+        if (manualPath.length === 0) console.log('Tracing path...')
+        if (manualPath.length === 0 || distance(pos, manualPath[manualPath.length - 1]) > 1) {
+          manualPath.push(pos)
+        }
+
+        if (manualPath.length > 0) {
+          p.colorMode(p.RGB)
+          p.stroke(255, 255, 255, 100)
+          p.strokeWeight(5)
+          p.noFill()
+          p.beginShape()
+          for (let i = 0; i < manualPath.length; i++) {
+            p.vertex(manualPath[i].x, manualPath[i].y)
+          }
+          p.endShape()
+          p.strokeWeight(2)
+        }
+      } else if (manualPath.length > 0) {
+        // resolve manual path
+        data = sortDataFromManualPath(data, manualPath)
+        p.setSetup(false)
+        manualPath = []
+        console.log('Finished tracing path')
+      }
 
       if (nCircles.value() !== kMax) {
         path = []
@@ -271,12 +586,21 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       p.stroke(10, 130, 100)
       p.strokeJoin(p.ROUND)
       // p.beginShape()
-      p.colorMode(p.HSB)
       for (let i = 0; i < size; i++) {
+        if (data.getRowCount() < size) return
         const xpos = data.getNum(i, 'x')
         const ypos = data.getNum(i, 'y')
-        p.stroke(i / size, 1, 1)
+        // if (i === 0) console.log(p.mouseX, p.mouseY, xpos * cam.view.zoom + cam.world.x, ypos * cam.view.zoom + cam.world.y)
+        if (
+          (p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
+          p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
+          p.colorMode(p.RGB)
+          p.stroke(255, 255, 255)
+        } else {
+          p.stroke(i / size, 1, 1)
+        }
         p.point(xpos, ypos)
+        p.colorMode(p.HSB)
       }
       // p.endShape(p.CLOSE)
       if (tracePath) {
@@ -336,6 +660,10 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
           // The path traced by the epicycles.
           path.push(p.createVector(centerX[kMax], -centerY[kMax]))
+          if (follow) {
+            cam.world.x = -centerX[kMax] * cam.view.zoom + cam.view.x + p.width / 2
+            cam.world.y = -centerY[kMax] * cam.view.zoom + cam.view.y + p.height / 2
+          }
 
           p.showXYTraces(centerX[kMax], -centerY[kMax])
 
