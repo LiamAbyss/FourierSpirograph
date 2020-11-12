@@ -5,15 +5,15 @@ let predefinedComputedOutlines = []
 let computeSize = -1
 let outlineResults
 let premeshSel
- 
-//gets predifined thresholds from a file and return them as a list
+
+// gets predifined thresholds from a file and return them as a list
 const getThresholdsFromCsv = (thresholdFile) => {
   const res = []
   const lines = thresholdFile.split('\r\n')
   lines.forEach((line) => {
     if (line.search('ut') !== -1) return
     const buff = line.split(',')
-    //push upper and lower threshold is res
+    // push upper and lower threshold is res
     res.push({
       lt: parseFloat(buff[0]),
       ut: parseFloat(buff[1])
@@ -22,8 +22,8 @@ const getThresholdsFromCsv = (thresholdFile) => {
   return res
 }
 
-//ATTENTION : noter qu'il faut peut etre changer le nom de la fonction ?
-//gets the text from a csv file to set the predefined thresholds
+// ATTENTION : noter qu'il faut peut etre changer le nom de la fonction ?
+// gets the text from a csv file to set the predefined thresholds
 const getText = (url) => {
   // read text from URL location
   var request = new XMLHttpRequest()
@@ -43,7 +43,7 @@ const meshOutlinePixels = (data, margin) => {
   if (data === undefined || data.length === 0) return
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
-    //why not data[i+3] ?
+    // why not data[i+3] ?
     if (data[i] && data[i + 1] && data[i + 2]) {
       // PREMESH
       if (cpt % premeshSel.value !== 0) {
@@ -67,7 +67,7 @@ const meshOutlinePixels = (data, margin) => {
       }
     }
   }
-  
+
   if (newData.length === 0) return
   const rows = [['x', 'y']]
   newData.forEach(e => {
@@ -81,8 +81,7 @@ const meshOutlinePixels = (data, margin) => {
   return data
 }
 
-
-// 
+//
 window.onload = () => {
   // When an image is loaded
   outlineResults = document.getElementById('outlineResults')

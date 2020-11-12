@@ -4,22 +4,18 @@
 let s
 
 /**
- * 
- * 
+ *
+ *
  */
 
 const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => {
-  
-  let data //list of points, dataset
-  let size //number of points in the dataset
-  let n // = (size - 1)/2 
+  let data // list of points, dataset
+  let size // number of points in the dataset
+  let n // = (size - 1)/2
 
-  let path = [] //path of the spirograph 
+  let path = [] // path of the spirograph
 
   let angle // This number traces the curve
-
-  let size // = Length(listP)
-  let n // = (size - 1)/2
 
   let T = []
 
@@ -30,7 +26,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let arrayCy = []
   let tempCx = []
   let tempCy = []
-  //Fourier's coeff
+  // Fourier's coeff
   let Cx
   let Cy
 
@@ -220,6 +216,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   if (s !== undefined) {
     s.remove()
   }
+  // eslint-disable-next-line new-cap
   s = new p5((p) => {
     // From https://github.com/nenadV91/p5_zoom
 
