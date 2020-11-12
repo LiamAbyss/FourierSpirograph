@@ -61,7 +61,7 @@ const meshOutlinePixels = (data, margin) => {
       }
     }
   }
-
+  
   if (newData.length === 0) return
   const rows = [['x', 'y']]
   newData.forEach(e => {
