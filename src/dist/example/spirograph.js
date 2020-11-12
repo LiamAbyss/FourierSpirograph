@@ -64,6 +64,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let manualPath = []
 
   let follow = false
+  let nCircles
 
   const controls = {
     view: { x: 0, y: 0, zoom: 1 },
@@ -316,12 +317,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         follow = !follow
       })
 
-      nCircles = p.createSlider(1, n, 1).parent(parent)
-      nCircles.id('nCirclesSlider')
-      nCircles.changed(() => {
-        p.clear()
-      })
-
       cam = new Cam(p.width / 2, p.height / 2)
 
       canvas.mouseWheel(e => cam.zoom(e, p))
@@ -367,6 +362,16 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
       size = data.getRowCount()
       n = (size - 1) / 2
+
+      if (nCircles !== undefined) {
+        nCircles.remove()
+      }
+
+      nCircles = p.createSlider(1, n, 1).parent(parent)
+      nCircles.id('nCirclesSlider')
+      nCircles.changed(() => {
+        p.clear()
+      })
 
       for (let i = 0; i < size; i++) {
         T[i] = 2 * p.PI * i / size
@@ -530,7 +535,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         }
         const selectedRows = []
         const weight = 20 / cam.view.zoom
-        console.log(weight)
         for (let i = 0; i < size; i++) {
           if (size > data.getRowCount()) return
           const xpos = data.getNum(i, 'x')
