@@ -61,6 +61,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
   let manualPath = []
 
+  let follow = false
+
   const controls = {
     view: { x: 0, y: 0, zoom: 1 },
     viewPos: { prevX: null, prevY: null, isDragging: false }
@@ -298,6 +300,12 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       importFileInput.hide()
       importButton.mouseReleased(e => {
         document.getElementById('importButton').click()
+      })
+
+      followCheckbox = p.createCheckbox('Follow path', false).parent(parent)
+      followCheckbox.id('followCheckbox')
+      followCheckbox.changed(() => {
+        follow = !follow
       })
 
       nCircles = p.createSlider(1, n, 1).parent(parent)
@@ -629,6 +637,10 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
           // The path traced by the epicycles.
           path.push(p.createVector(centerX[kMax], -centerY[kMax]))
+          if (follow) {
+            cam.world.x = -centerX[kMax] * cam.view.zoom + cam.view.x + p.width / 2
+            cam.world.y = -centerY[kMax] * cam.view.zoom + cam.view.y + p.height / 2
+          }
 
           p.showXYTraces(centerX[kMax], -centerY[kMax])
 
