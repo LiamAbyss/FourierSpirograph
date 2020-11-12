@@ -524,17 +524,44 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
           p.setSetup()
         }
       } else if (p.keyIsDown(88)) {
+        const pos = {
+          x: (p.mouseX - cam.world.x) / cam.view.zoom,
+          y: (p.mouseY - cam.world.y) / cam.view.zoom
+        }
+        const selectedRows = []
+        const weight = 20 / cam.view.zoom
+        console.log(weight)
         for (let i = 0; i < size; i++) {
-          if (data.getRowCount() < size) return
+          if (size > data.getRowCount()) return
           const xpos = data.getNum(i, 'x')
           const ypos = data.getNum(i, 'y')
-          if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
-            p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
-            // remove point
-            data.removeRow(i)
-            p.setSetup()
+          if (pos.x >= xpos - (weight + 2) / 2 && pos.x <= xpos + (weight + 2) / 2 &&
+            pos.y >= ypos - (weight + 2) / 2 && pos.y <= ypos + (weight + 2) / 2) {
+            selectedRows.push(i)
           }
         }
+
+        if (selectedRows.length && data.getRowCount() > selectedRows.length) {
+          const newData = new p5.Table()
+          newData.addColumn('x')
+          newData.addColumn('y')
+          for (let i = 0; i < size; i++) {
+            if (!selectedRows.includes(i)) {
+              const newRow = newData.addRow()
+              newRow.setNum('x', data.getNum(i, 'x'))
+              newRow.setNum('y', data.getNum(i, 'y'))
+            }
+          }
+          data = newData
+          p.setSetup()
+        }
+
+        p.colorMode(p.RGB)
+        p.stroke(255, 255, 255, 100)
+        p.fill(p.color(255, 255, 255, 100))
+        p.ellipse(pos.x, pos.y, weight)
+        p.noFill()
+        p.strokeWeight(2)
       } else if (p.keyIsDown(70)) {
         for (let i = 0; i < size; i++) {
           if (data.getRowCount() < size) return
