@@ -93,7 +93,7 @@ window.onload = () => {
   const outlineCanvas = document.getElementById('outlineCanvas')
   const marginInput = document.getElementById('imageMargin')
   let imgd
-
+  launchSpirograph(undefined, outlineResults, true, outlineResults.offsetWidth - 100, outlineResults.offsetHeight - 100)
   function previewImage () {
     var oFReader = new FileReader()
     oFReader.readAsDataURL(fileInput.files[0])

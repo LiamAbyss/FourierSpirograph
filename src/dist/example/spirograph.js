@@ -274,7 +274,9 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       sel.option('Approx. Curve')
       sel.changed(p.selectSketchMode)
 
-      //Exports dataset as CSV file
+      speedSlider = p.createSlider(0.0001, 0.01, 0.007, 0.0005).parent(parent)
+      speedSlider.id('speedSlider')
+
       exportButton = p.createButton('Export').parent(parent)
       exportButton.mousePressed(e => {
         const newData = []
@@ -729,7 +731,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         }
       }
 
-      angle -= 0.007
+      angle -= speedSlider.value()
       p.max += 0.2
 
       if (path.length > 10000) {
