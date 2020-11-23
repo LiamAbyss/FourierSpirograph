@@ -12,6 +12,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let data // list of points, dataset
   let size // number of points in the dataset
   let n // = (size - 1)/2
+  const settingsDiv = document.getElementById('settingsSidebar')
 
   let path = [] // path of the spirograph
 
@@ -262,21 +263,17 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     }
 
     p.setup = () => {
-      const canvas = p.createCanvas(canvasWidth, canvasHeight).parent(parent)
-      canvas.id('sketchCanvas')
-      p.colorMode(p.HSB, 1, 1, 1)
-      p.background(1)
+      sel = p.createSelect().parent(settingsDiv)
 
-      sel = p.createSelect().parent(parent)
       sel.id('sketchModeSelector')
       sel.option('Epicycles')
       sel.option('Approx. Curve')
       sel.changed(p.selectSketchMode)
 
-      speedSlider = p.createSlider(0.0001, 0.01, 0.007, 0.0005).parent(parent)
+      speedSlider = p.createSlider(0.0001, 0.01, 0.007, 0.0005).parent(settingsDiv)
       speedSlider.id('speedSlider')
 
-      exportButton = p.createButton('Export').parent(parent)
+      exportButton = p.createButton('Export').parent(settingsDiv)
       exportButton.mousePressed(e => {
         const newData = []
         for (let i = 0; i < data.getRowCount(); i++) {
@@ -296,7 +293,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         window.location = encodedUri
       })
 
-      importButton = p.createButton('Import').parent(parent)
+      importButton = p.createButton('Import').parent(settingsDiv)
       const importFileInput = p.createFileInput((file) => {
         const newData = p.loadTable(file.data, 'csv', 'header', () => {
           if (file.name.endsWith('.csv')) {
@@ -314,11 +311,16 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         document.getElementById('importButton').click()
       })
 
-      followCheckbox = p.createCheckbox('Follow path', false).parent(parent)
+      followCheckbox = p.createCheckbox('Follow path', false).parent(settingsDiv)
       followCheckbox.id('followCheckbox')
       followCheckbox.changed(() => {
         follow = !follow
       })
+
+      const canvas = p.createCanvas(canvasWidth, canvasHeight).parent(parent)
+      canvas.id('sketchCanvas')
+      p.colorMode(p.HSB, 1, 1, 1)
+      p.background(1)
 
       cam = new Cam(p.width / 2, p.height / 2)
 
@@ -370,7 +372,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         nCircles.remove()
       }
 
-      nCircles = p.createSlider(1, n, 1).parent(parent)
+      nCircles = p.createSlider(1, n, 1).parent(settingsDiv)
       nCircles.id('nCirclesSlider')
       nCircles.changed(() => {
         p.clear()

@@ -6,6 +6,19 @@ let computeSize = -1
 let outlineResults
 let premeshSel
 
+// eslint-disable-next-line no-unused-vars
+function toggleNav () {
+  const sidebar = document.getElementById('settingsSidebar')
+  if (sidebar.style.width === '250px') {
+    sidebar.style.width = '0px'
+  } else sidebar.style.width = '250px'
+}
+
+// eslint-disable-next-line no-unused-vars
+function closeNav () {
+  document.getElementById('settingsSidebar').style.width = '0'
+}
+
 // gets predifined thresholds from a file and return them as a list
 const getThresholdsFromCsv = (thresholdFile) => {
   const res = []
