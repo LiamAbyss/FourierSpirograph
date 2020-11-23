@@ -2,12 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 let s
-
-/**
- *
- *
- */
-
+//Start drawing the spirograph
 const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => {
   let data // list of points, dataset
   let size // number of points in the dataset
@@ -75,6 +70,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
   }
 
+  //find the path from manual input on the canvas
   const sortDataFromManualPath = (data, path) => {
     const orderedPoints = []
     const newData = []
@@ -133,7 +129,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     }
     return data
   }
-
+  //finds the nearest point in a table
   const nearestPoint = (point, pointsTable) => {
     if (pointsTable === undefined || pointsTable.length === 0) return
     let currentDist = 0
@@ -152,6 +148,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     return nearest
   }
 
+  //Sort Points in a dataset so that each point is the nearest from its neighbour
   const sortPointsInOrder = (data, first) => {
     const newData = []
     for (let i = 0; i < data.getRowCount(); i++) {
@@ -165,6 +162,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     let orderedPoints = []
 
     let remainingPoints = newData
+
     let lastNearest = first
     for (let i = 0; i < newData.length; i++) {
       orderedPoints.push(lastNearest)
@@ -182,7 +180,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     if (!aftermeshed) {
       const aftermeshSel = document.getElementById('aftermesh')
       for (let i = 0; i < orderedPoints.length; i++) {
-      // AFTERMESH
+      // AFTERMESH : drop points after sorting the dataset
         if (i % aftermeshSel.value) {
           orderedPoints[i] = undefined
         }
@@ -217,6 +215,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   if (s !== undefined) {
     s.remove()
   }
+  //Using p5 librairie
   // eslint-disable-next-line new-cap
   s = new p5((p) => {
     // From https://github.com/nenadV91/p5_zoom
@@ -229,6 +228,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       data = p.loadTable(uri, 'csv', 'header')
     }
 
+    //set and draw the shape
     p.showXYTraces = (x, y) => {
       const reversePath = [...path].reverse()
       p.strokeWeight(1)
@@ -261,6 +261,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       p.colorMode(p.HSB)
     }
 
+    //Sets the drawing canvas up
     p.setup = () => {
       const canvas = p.createCanvas(canvasWidth, canvasHeight).parent(parent)
       canvas.id('sketchCanvas')
@@ -296,6 +297,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         window.location = encodedUri
       })
 
+      //Import a dataset from a CSV file
       importButton = p.createButton('Import').parent(parent)
       const importFileInput = p.createFileInput((file) => {
         const newData = p.loadTable(file.data, 'csv', 'header', () => {
@@ -322,6 +324,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
       cam = new Cam(p.width / 2, p.height / 2)
 
+      //Lets us move the canvas, zoom and drag to move enabled
       canvas.mouseWheel(e => cam.zoom(e, p))
       document.getElementById('sketchCanvas').addEventListener('mousedown', (e) => cam.mousePressed(e))
       document.getElementById('sketchCanvas').addEventListener('mousemove', (e) => cam.mouseDragged(e, p))
@@ -333,6 +336,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       // print(K);
     }
 
+    //Initialisation
+    //Find the epicycles fitting the dataset
     p.setSetup = (sort, first, newData) => {
       if (sort === undefined) sort = true
       if (newData === undefined) newData = data
@@ -427,10 +432,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
       p.reverse(CNegX)
       p.reverse(CNegY)
-      // print(CPosX.length);
-      // print(CPosX);
-      // print(CNegX);
-      // print(CNegY);
 
       for (i = 0; i < 2 * n; i++) {
         const cond = p.floor(i / 2)
@@ -442,10 +443,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
           CCordY[i] = CNegY[cond]
         }
       }
-
-      // print(CCordY.length);
-      // print(CCordX);
-      // print(CCordY);
 
       for (i = 0; i < size - 1; i++) {
         Rho[i] = p.dist(0, 0, CCordX[i], CCordY[i])
@@ -475,15 +472,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       }
 
       p.reverse(sortedNumbers)
-      // print(indRho.sort(p.sortFunction));
-      // print(sortedNumbers);
-
-      // RhoSorted = Rho;
-      // print(Rho.length);
-      // print(Rho);
-      // print(Rho);
-      // print(Ang.length);
-      // print(Ang);
 
       for (i = 0; i < 2 * n; i++) {
         const seq = p.ceil((i + 1) / 2) * p.pow((-1), (i + 2))
@@ -722,7 +710,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         // approximated by adding terms in the
         // Fourier series.
 
-          // // The approximation curve
+          // The approximation curve
 
           p.strokeWeight(3)
           p.stroke(1)
