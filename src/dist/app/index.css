@@ -5,6 +5,25 @@ html, body {
     background-color: rgb(153, 153, 153);
 }
 
+input, select, option {
+    background: transparent;
+    font-family: inherit;
+    text-overflow: ellipsis;
+    border: 0;
+    max-width: 100%;
+}
+
+input#uploadImage {
+    margin: 0px -20px;
+}
+
+input#imageMargin {
+    box-sizing: border-box;
+    width: 40%;
+    text-align: center;
+    margin-top: 30%;
+}
+
 #global {
     height: 100%;
     width: 100%;
@@ -19,15 +38,26 @@ html, body {
 }
 
 div#title.center-items.center-text {
-    background-color: rgb(116, 52, 40);
+    background-color: rgb(150, 51, 34);
     margin-bottom: 15px;
     padding-left: 2%;
     padding-top: 15px;
     border-bottom: 15px solid rgb(54, 54, 54);
+    overflow: hidden;
 }
+
 div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     background-color: rgb(224, 224, 224);
-    border: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: large;
+    border: 10px;
+    max-width: 100%;
+}
+
+#outlineSettings div.flex-col {
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 #app {
@@ -42,7 +72,6 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     margin-left: 1%;
     margin-right: 1%;
     justify-content: space-around;
-    border: 2px solid black;
 }
 
 #outlineResults {
@@ -54,7 +83,6 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     height: 100%;
     width: 69%;
     margin-right: 1%;
-    border: 2px solid black;
 }
 
 #uploadedImage {
@@ -118,6 +146,7 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
 
 .center-items {
     align-items: center;
+    overflow: auto;
 }
 
 .center-text {

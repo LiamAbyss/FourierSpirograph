@@ -56,7 +56,7 @@ const meshOutlinePixels = (data, margin) => {
   if (data === undefined || data.length === 0) return
   let cpt = 0
   for (let i = 0; i < data.length; i += 4) {
-    // why not data[i+3] ?
+    
     if (data[i] && data[i + 1] && data[i + 2]) {
       // PREMESH
       if (cpt % premeshSel.value !== 0) {
@@ -69,6 +69,8 @@ const meshOutlinePixels = (data, margin) => {
   }
 
   const newData = []
+
+  //margin
   for (let i = 0; i < data.length; i += 4) {
     if (data[i] && data[i + 1] && data[i + 2]) {
       if (((i / 4) % window.appData.width > margin && (i / 4) % window.appData.width < outlineCanvas.width - margin) &&
@@ -99,6 +101,7 @@ window.onload = () => {
   // When an image is loaded
   outlineResults = document.getElementById('outlineResults')
   premeshSel = document.getElementById('premesh')
+  //to change : fileInput -> imgInput ?
   const fileInput = document.getElementById('uploadImage')
   const outlineCanvas = document.getElementById('outlineCanvas')
   const marginInput = document.getElementById('imageMargin')
@@ -109,8 +112,10 @@ window.onload = () => {
     oFReader.readAsDataURL(fileInput.files[0])
 
     oFReader.onload = function (oFREvent) {
+      //fileInput.src = oFREvent.target.result ?
       document.getElementById('uploadedImage').src = oFREvent.target.result
     }
+    //read and load image
     readFileAsDataURL(fileInput.files[0])
       .then(loadImage)
       .then(setCanvasSizeFromImage(outlineCanvas))
@@ -129,6 +134,7 @@ window.onload = () => {
   };
   fileInput.addEventListener('input', previewImage)
 
+  //Threshold part
   const slider = document.getElementById('thresholdSlider')
   const autoSlider = document.getElementById('autoThresholdSlider')
   const lt = document.getElementById('lt')
@@ -149,7 +155,7 @@ window.onload = () => {
     lt.value = slider.noUiSlider.get()[0]
     ut.value = slider.noUiSlider.get()[1]
   })
-
+  //change value of Lower threshold
   lt.addEventListener('change', () => {
     if (toggleThresholdButton.toggled) {
       if (lt.value > ut.value) { lt.value = ut.value }
@@ -157,7 +163,7 @@ window.onload = () => {
     }
     slider.noUiSlider.set([lt.value, null])
   })
-
+  //change value of Lower threshold
   ut.addEventListener('change', () => {
     if (toggleThresholdButton.toggled) {
       if (ut.value < lt.value) { ut.value = lt.value }
@@ -176,21 +182,11 @@ window.onload = () => {
     }
   })
   autoSlider.setAttribute('disabled', true)
-
+  //update values of lower and upper threshold and find points to drax Spirograph
   autoSlider.noUiSlider.on('update', () => {
     if (predefinedThresholds === undefined || predefinedComputedOutlines.length === 0) return
     lt.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].lt
     ut.value = predefinedThresholds[parseInt(autoSlider.noUiSlider.get()) - 1].ut
-    // console.log(predefinedComputedOutlines.length)
-    // outlineCanvas
-    //   .getContext('2d')
-    //   .putImageData(
-    //     new ImageData(new Uint8ClampedArray(
-    //       predefinedComputedOutlines[parseInt(autoSlider.noUiSlider.get()) - 1].data),
-    //     window.appData.width, window.appData.height),
-    //     0,
-    //     0)
-
     meshOutlinePixels([...predefinedComputedOutlines[parseInt(autoSlider.noUiSlider.get()) - 1].data], marginInput.value)
   })
 
@@ -245,6 +241,7 @@ window.onload = () => {
 
   // Outline submission
   window.appData = {}
+  // worker finds edges
   let worker
   function initWorker () {
     worker = new Worker('../dist/outline/worker.js')
@@ -277,6 +274,7 @@ window.onload = () => {
     }
   }
 
+  //Submit to find edges
   const outlineButton = document.getElementById('outlineSubmit')
   outlineButton.addEventListener('click', () => {
     window.appData.lt = parseFloat(lt.value)
@@ -295,6 +293,7 @@ window.onload = () => {
     worker.postMessage({ cmd: 'imgData', data: pixels })
   })
 
+  //Submit when "enter" key is pressed
   document.addEventListener('keypress', (ev) => {
     if (ev.key === 'Enter') {
       const trigger = document.createEvent('HTMLEvents')
