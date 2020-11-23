@@ -22,6 +22,9 @@
                 <div id="outlineSettings" class="flex-col center-items">
                     <div class="flex-col center-items">
                         <img id="uploadedImage" src="" alt="Choose image"/>
+                        <label for="uploadImage" class="input-button">
+                            Upload image 
+                        </label>
                         <input type="file" id="uploadImage" accept="image/*"/>
                         <div id="imageMargin" class="center-text">
                             <label for="imageMargin">Margin</label>
@@ -38,7 +41,7 @@
                     </div>
                     <div>
                         <div class="flex-row">
-                            <label for="premesh">Premesh</label>
+                            <label for="premesh">Premesh :</label>
                             <select name="premesh" id="premesh">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -50,7 +53,7 @@
                         </div>
                         <br/>
                         <div class="flex-row">
-                            <label for="aftermesh">Aftermesh</label>
+                            <label for="aftermesh">Aftermesh :</label>
                             <select name="aftermesh" id="aftermesh">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -66,7 +69,6 @@
                 </div>
                 <div id="outlineResults" class="center-items">
                     <div id="settingsSidebar" class="sidebar flex-col center-items">
-                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a> 
                     </div>
                     
                     <button class="openbtn" onclick="toggleNav()">☰ Open Settings</button>

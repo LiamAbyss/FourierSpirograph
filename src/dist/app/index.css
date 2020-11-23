@@ -5,12 +5,15 @@ html, body {
     background-color: rgb(153, 153, 153);
 }
 
-input, select, option {
-    background: transparent;
+select, option, input#imageMargin, input#lt, input#ut {
+    padding: 10px;
+    margin-top: -5px;
+    margin-left: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
     font-family: inherit;
     text-overflow: ellipsis;
     border: 0;
-    max-width: 100%;
+    width: fit-content;
 }
 
 input#uploadImage {
@@ -59,6 +62,37 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     max-width: 100%;
     overflow: hidden;
 }
+
+ button, .input-button{
+    background-color: rgb(150, 51, 34);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: larger;
+    color: white;
+    padding: 15px;
+    border-radius: 3px;
+    border: 3px solid rgb(124, 43, 28);
+    border-right: none;
+    border-top: none;
+    
+}
+
+input[type="file"] {
+    display: none;
+}
+
+button:hover, .input-button:hover{
+    background: rgb(153, 153, 153);
+    border: 3px solid rgb(136, 136, 136);
+    border-right: none;
+    border-top: none;
+}
+
+button:active, .input-button:active{
+    border: 3px solid rgb(136, 136, 136);
+    border-left: none;
+    border-bottom: none;
+}
+
 
 #app {
     height: 89%;
@@ -113,10 +147,6 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     display: none;
 }
 
-#nCirclesSlider{
-    width: 50%;
-}
-
 .noUi-tooltip {
     display: none !important;
 }
@@ -157,7 +187,9 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
 
 /* Settings Sidebar */
 .sidebar {
-    height: 81%;
+    display: flex;
+    align-items: stretch;
+    height: 100%;
     width: 0;
     position: fixed;
     z-index: 1;
@@ -166,8 +198,30 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     background-color: rgb(153, 153, 153);;
     overflow-x: hidden;
     transition: 0.2s;
-    padding-top: 60px;
   }
+
+  .sidebar *{
+      margin: 5%;
+  }
+
+  .sidebar p{
+      padding-bottom: 0px;
+      margin-bottom: -5%;
+  }
+  
+  
+.sidebar button:hover{
+    background: rgb(54, 54, 54) ;
+    border: 3px solid rgb(136, 136, 136);
+    border-right: none;
+    border-top: none;
+}
+
+.sidebar button:active{
+    border: 3px solid rgb(136, 136, 136);
+    border-left: none;
+    border-bottom: none;
+}
   
   .sidebar a {
     padding: 8px 8px 8px 32px;
@@ -193,14 +247,11 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
   .openbtn {
     font-size: 20px;
     cursor: pointer;
-    background-color: #111;
+    background-color: rgb(150, 51, 34);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: large;
     color: white;
     padding: 10px 15px;
-    border: none;
-  }
-  
-  .openbtn:hover {
-    background-color: #444;
   }
   
   

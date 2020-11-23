@@ -264,12 +264,17 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
     // Sets the drawing canvas up
     p.setup = () => {
-      sel = p.createSelect().parent(settingsDiv)
+      sketchModeLabel = p.createP('Sketch Mode :').parent(settingsDiv)
+      sketchModeLabel.id('sketchModeLabel')
 
+      sel = p.createSelect().parent(settingsDiv)
       sel.id('sketchModeSelector')
       sel.option('Epicycles')
       sel.option('Approx. Curve')
       sel.changed(p.selectSketchMode)
+
+      speedSliderLabel = p.createP('Speed :').parent(settingsDiv)
+      speedSliderLabel.id('speedSliderLabel')
 
       speedSlider = p.createSlider(0.0001, 0.01, 0.007, 0.0005).parent(settingsDiv)
       speedSlider.id('speedSlider')
@@ -317,6 +322,9 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       followCheckbox.changed(() => {
         follow = !follow
       })
+
+      nCirclesLabel = p.createP('Number of circles : ').parent(settingsDiv)
+      nCirclesLabel.id('nCirclesLabel')
 
       const canvas = p.createCanvas(canvasWidth, canvasHeight).parent(parent)
       canvas.id('sketchCanvas')

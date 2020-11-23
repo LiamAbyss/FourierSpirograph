@@ -14,11 +14,6 @@ function toggleNav () {
   } else sidebar.style.width = '250px'
 }
 
-// eslint-disable-next-line no-unused-vars
-function closeNav () {
-  document.getElementById('settingsSidebar').style.width = '0'
-}
-
 // gets predifined thresholds from a file and return them as a list
 const getThresholdsFromCsv = (thresholdFile) => {
   const res = []
