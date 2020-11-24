@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
       <meta charset="utf-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
       <title>Fourier Spirograph Alpha v0.3.1</title>
       <link rel="stylesheet" href="/dist/app/index.css"/>
       <script src="/dist/lib/nouislider.js"></script>
@@ -26,7 +27,7 @@
                             Upload image 
                         </label>
                         <input type="file" id="uploadImage" accept="image/*"/>
-                        <div id="imageMargin" class="center-text">
+                        <div id="imageMarginDiv" class="center-text">
                             <label for="imageMargin">Margin</label>
                             <input type="number" id="imageMargin" name="imageMargin" min="0" value="0"/>
                         </div>
@@ -67,7 +68,7 @@
                     <button type="button" id="toggleThreshold">Show automatic threshold choices</button>
                     <button type="button" id="outlineSubmit">Find edges</button>
                 </div>
-                <div id="outlineResults" class="center-items">
+                <div id="outlineResults" class="center-items flex-col">
                     <div id="settingsSidebar" class="sidebar flex-col center-items">
                     </div>
                     
