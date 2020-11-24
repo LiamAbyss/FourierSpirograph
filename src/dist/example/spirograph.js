@@ -86,6 +86,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   const sortDataFromManualPathArray = (data) => {
     const orderedPoints = []
     const newData = []
+    let error = false
     for (let i = 0; i < data.getRowCount(); i++) {
       newData.push({
         x: data.getNum(i, 'x'),
@@ -97,13 +98,14 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     let orderedPointsFromPaths = []
     manualPath.forEach(path => {
       orderedPointsFromPaths.push(sortDataFromManualPath(newData, path, false))
+      if (orderedPointsFromPaths[orderedPointsFromPaths.length - 1].length === 0) error = true
     })
     // Erase path if overridden
     const toErase = []
     for (let i = 0; i < orderedPointsFromPaths.length; i++) {
       for (let j = i + 1; j < orderedPointsFromPaths.length; j++) {
         for (let k = 0; k < orderedPointsFromPaths[j].length; k++) {
-          if (orderedPointsFromPaths[i].includes(orderedPointsFromPaths[j][k])) {
+          if (orderedPointsFromPaths[i].includes(orderedPointsFromPaths[j][k]) || orderedPointsFromPaths[i].length === 0) {
             if (!toErase.includes(i)) toErase.push(i)
             break
           }
@@ -115,6 +117,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       orderedPointsFromPaths = removeFromArray(orderedPointsFromPaths, orderedPointsFromPaths[index])
       manualPath = removeFromArray(manualPath, manualPath[index])
     })
+    if (error) return data
     console.log('erased')
 
     // Order all sections of points
@@ -137,12 +140,13 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         if (currentIndex !== -1) break
         newSection.push(pseudoOrderedPoints[j])
       }
-      for (let k = 0; k < orderedPointsFromPaths.length; k++) {
-        for (let j = 0; j < orderedPointsFromPaths[k].length; j++) {
-          if (!newSection.includes(orderedPointsFromPaths[currentIndex][j])) continue
-          newSection = removeFromArray(newSection, orderedPointsFromPaths[currentIndex][j])
-        }
-      }
+      if (currentIndex === -1) return data
+      orderedPointsFromPaths.forEach(path => {
+        path.forEach(point => {
+          if (!newSection.includes(point)) return
+          newSection = removeFromArray(newSection, point)
+        })
+      })
       console.log(manualPath.length, currentIndex)
       if (newSection.length > 0) sections.push(newSection)
       sections.push(orderedPointsFromPaths[currentIndex])
@@ -200,7 +204,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       let currentDist = 0
       for (let j = 0; j < path.length; j++) {
         currentDist = distance(newData[i], path[j])
-        if (currentDist < minDist && currentDist < 15) {
+        if (currentDist < minDist && currentDist < 7) {
           minDist = currentDist
           point = path[j]
         }
