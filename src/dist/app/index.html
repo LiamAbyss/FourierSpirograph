@@ -14,7 +14,7 @@
       <script type="text/javascript" src="/dist/app/index.js"></script>
     </head>
     <body>
-        <div id="global" class="flex-col space-between">
+        <div id="global" class="flex-col">
             <div id="title" class="center-items center-text">
                 <h1 class="center-text">Fourier Spirograph</h1>
                 <p> Alpha v0.3.1</p>
@@ -35,9 +35,11 @@
                     <div id="thresholdSlider"></div>
                     <div id="autoThresholdSlider"></div>
                     <div class="center-text" id="thresholdChoices">
-                        <label for="lt">Lower Threshold</label>
+                        <label for="lt">Lower Threshold :</label>
                         <input type="text" id="lt">
-                        <label for="ut">Upper Threshold</label>
+                        <br>
+                        <br>    
+                        <label for="ut">Upper Threshold :</label>
                         <input type="text" id="ut">
                     </div>
                     <div>
@@ -70,10 +72,11 @@
                 </div>
                 <div id="outlineResults" class="center-items flex-col">
                     <div id="settingsSidebar" class="sidebar flex-col center-items">
+                        <div id="settingsDiv" class="flex-col"></div>
+                        <div id="buttonsDiv"></div>
                     </div>
                     
                     <button class="openbtn" onclick="toggleNav()">☰ Open Settings</button>
-                
                     <canvas id="outlineCanvas"></canvas>
                 </div>
             </div>

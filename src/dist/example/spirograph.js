@@ -7,7 +7,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   let data // list of points, dataset
   let size // number of points in the dataset
   let n // = (size - 1)/2
-  const settingsDiv = document.getElementById('settingsSidebar')
+  const settingsDiv = document.getElementById('settingsDiv')
+  const buttonsDiv = document.getElementById('buttonsDiv')
 
   let path = [] // path of the spirograph
 
@@ -264,22 +265,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
     // Sets the drawing canvas up
     p.setup = () => {
-      sketchModeLabel = p.createP('Sketch Mode :').parent(settingsDiv)
-      sketchModeLabel.id('sketchModeLabel')
-
-      sel = p.createSelect().parent(settingsDiv)
-      sel.id('sketchModeSelector')
-      sel.option('Epicycles')
-      sel.option('Approx. Curve')
-      sel.changed(p.selectSketchMode)
-
-      speedSliderLabel = p.createP('Speed :').parent(settingsDiv)
-      speedSliderLabel.id('speedSliderLabel')
-
-      speedSlider = p.createSlider(0.0001, 0.01, 0.007, 0.0005).parent(settingsDiv)
-      speedSlider.id('speedSlider')
-
-      exportButton = p.createButton('Export').parent(settingsDiv)
+      exportButton = p.createButton('Export').parent(buttonsDiv)
       exportButton.mousePressed(e => {
         const newData = []
         for (let i = 0; i < data.getRowCount(); i++) {
@@ -299,7 +285,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         window.location = encodedUri
       })
 
-      importButton = p.createButton('Import').parent(settingsDiv)
+      importButton = p.createButton('Import').parent(buttonsDiv)
       const importFileInput = p.createFileInput((file) => {
         const newData = p.loadTable(file.data, 'csv', 'header', () => {
           if (file.name.endsWith('.csv')) {
@@ -316,6 +302,21 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       importButton.mouseReleased(e => {
         document.getElementById('importButton').click()
       })
+
+      sketchModeLabel = p.createP('Sketch Mode :').parent(settingsDiv)
+      sketchModeLabel.id('sketchModeLabel')
+
+      sel = p.createSelect().parent(settingsDiv)
+      sel.id('sketchModeSelector')
+      sel.option('Epicycles')
+      sel.option('Approx. Curve')
+      sel.changed(p.selectSketchMode)
+
+      speedSliderLabel = p.createP('Speed :').parent(settingsDiv)
+      speedSliderLabel.id('speedSliderLabel')
+
+      speedSlider = p.createSlider(0.0001, 0.05, 0.007, 0.0005).parent(settingsDiv)
+      speedSlider.id('speedSlider')
 
       followCheckbox = p.createCheckbox('Follow path', false).parent(settingsDiv)
       followCheckbox.id('followCheckbox')
@@ -705,15 +706,42 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
           p.showXYTraces(centerX[kMax], -centerY[kMax])
 
-          p.strokeJoin(p.ROUND)
-          p.stroke(1)
-          p.strokeWeight(2)
+          // p.strokeWeight(5)
+          // let i = 0
+          // var lastPoint
+          // p.colorMode(p.HSB)
+          // p.stroke(1, 1, 1)
+          // for (var pos in path) {
+          //   if (i === 0 || pos.x !== undefined) {
+          //     lastPoint = pos
+          //     i++
+          //   } else {
+          //     p.line(pos.x, -pos.y, lastPoint.x, -lastPoint.y)
+          //     lastPoint = pos
+          //     i++
+          //   }
+          // }
           p.noFill()
-          p.beginShape()
+          p.strokeWeight(2)
+          p.colorMode(p.HSB)
+          let i = 0
+          let maxLength
+          var lastPoint = path[0]
           for (var pos of path) {
-            p.vertex(pos.x, -pos.y)
+            p.stroke(i / (2 * p.PI), 1, 1)
+            p.line(pos.x, -pos.y, lastPoint.x, -lastPoint.y)
+            lastPoint = pos
+            i += speedSlider.value()
+            if (i > 2 * p.PI) {
+              maxLength = path.length
+              i = 0
+            }
+            path.reverse()
+            while (path.length >= maxLength) {
+              path.pop()
+            }
+            path.reverse()
           }
-          p.endShape()
         } else {
         // If 'show' is false, then show the curve
         // approximated by adding terms in the
