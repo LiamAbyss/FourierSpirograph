@@ -74,12 +74,13 @@ class Cam {
   }
 
   zoom (e, p) {
-    const {
+    let {
       x,
       y,
       deltaY
     } = e
-
+    x -= p.width / 2
+    y -= p.height / 2
     const direction = deltaY > 0 ? -1 : 1
     const factor = 0.05
     const zoom = direction * factor
@@ -90,7 +91,9 @@ class Cam {
     this.world.x -= wx * p.width * zoom
     this.world.y -= wy * p.height * zoom
     this.view.zoom += zoom
-
+    if (this.view.zoom < 0.2) {
+      this.view.zoom = 0.2
+    }
     this.updateView(p)
   }
 }

@@ -289,7 +289,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       const importFileInput = p.createFileInput((file) => {
         const newData = p.loadTable(file.data, 'csv', 'header', () => {
           if (file.name.endsWith('.csv')) {
-            p.setSetup(true, undefined, newData)
+            p.resetSketch(true, undefined, newData)
           } else {
             alert('The selected file doesn\'t have the correct extension\n' +
               'Given extension : .' + file.name.split('.')[1] + '\n' +
@@ -342,13 +342,13 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
       angle = p.PI / 3
 
-      p.setSetup()
+      p.resetSketch()
       // print(K);
     }
 
     // Initialisation
     // Find the epicycles fitting the dataset
-    p.setSetup = (sort, first, newData) => {
+    p.resetSketch = (sort, first, newData) => {
       if (sort === undefined) sort = true
       if (newData === undefined) newData = data
       data = newData
@@ -527,7 +527,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
           const newRow = data.addRow()
           newRow.setNum('x', pos.x)
           newRow.setNum('y', pos.y)
-          p.setSetup()
+          p.resetSketch()
         }
       } else if (p.keyIsDown(88)) {
         const pos = {
@@ -558,7 +558,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
             }
           }
           data = newData
-          p.setSetup()
+          p.resetSketch()
         }
 
         p.colorMode(p.RGB)
@@ -575,7 +575,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
           if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
             p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
             // set first point
-            p.setSetup(true, {
+            p.resetSketch(true, {
               x: xpos,
               y: ypos
             })
@@ -607,7 +607,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       } else if (manualPath.length > 0) {
         // resolve manual path
         data = sortDataFromManualPath(data, manualPath)
-        p.setSetup(false)
+        p.resetSketch(false)
         manualPath = []
         console.log('Finished tracing path')
       }
