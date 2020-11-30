@@ -129,6 +129,7 @@ window.onload = () => {
           .getImageData(0, 0, window.appData.width, window.appData.height)
       })
     marginInput.setAttribute('max', Math.min(outlineCanvas.width, outlineCanvas.height))
+    predefinedComputedOutlines = []
   };
   fileInput.addEventListener('input', previewImage)
 
@@ -197,41 +198,43 @@ window.onload = () => {
       autoSlider.style.display = 'none'
       slider.style.display = 'initial'
       toggleThresholdButton.innerText = 'Show automatic threshold choices'
-      autoSlider.setAttribute('disabled', true)
+      if (predefinedComputedOutlines.length === 0) {
+        autoSlider.setAttribute('disabled', true)
+      }
       slider.removeAttribute('disabled')
     } else {
       autoSlider.style.display = 'initial'
       slider.style.display = 'none'
       toggleThresholdButton.innerText = 'Show manual threshold choices'
-      slider.setAttribute('disabled', true)
       // autoSlider.removeAttribute('disabled')
 
       // const loadingText = document.getElementById('autoThresholdSlider')
       // loadingText.innerHTML = loadingText.innerHTML + '<p id="outlineLoadWarning">Loading</p>'
-
-      predefinedComputedOutlines = []
-      computeSize = predefinedThresholds.length - 1
-      for (let i = 0; i < predefinedThresholds.length; i++) {
-        predefinedComputedOutlines.push({
-          lt: predefinedThresholds[i].lt,
-          ut: predefinedThresholds[i].ut
-        })
-      }
-      for (let i = 0; i < predefinedThresholds.length; i++) {
-        window.appData.lt = parseFloat(predefinedThresholds[i].lt)
-        window.appData.ut = parseFloat(predefinedThresholds[i].ut)
-        initWorker()
-        worker.postMessage({
-          cmd: 'appData',
-          data: {
-            width: window.appData.width,
-            height: window.appData.height,
-            ut: window.appData.ut,
-            lt: window.appData.lt
-          }
-        })
-        const pixels = imgd.data
-        worker.postMessage({ cmd: 'imgData', data: pixels })
+      if (predefinedComputedOutlines.length === 0) {
+        slider.setAttribute('disabled', true)
+        computeSize = predefinedThresholds.length - 1
+        for (let i = 0; i < predefinedThresholds.length; i++) {
+          predefinedComputedOutlines.push({
+            lt: predefinedThresholds[i].lt,
+            ut: predefinedThresholds[i].ut
+          })
+        }
+        for (let i = 0; i < predefinedThresholds.length; i++) {
+          window.appData.lt = parseFloat(predefinedThresholds[i].lt)
+          window.appData.ut = parseFloat(predefinedThresholds[i].ut)
+          initWorker()
+          worker.postMessage({
+            cmd: 'appData',
+            data: {
+              width: window.appData.width,
+              height: window.appData.height,
+              ut: window.appData.ut,
+              lt: window.appData.lt
+            }
+          })
+          const pixels = imgd.data
+          worker.postMessage({ cmd: 'imgData', data: pixels })
+        }
       }
     }
     toggleThresholdButton.toggled = !toggleThresholdButton.toggled
