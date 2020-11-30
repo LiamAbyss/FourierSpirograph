@@ -706,42 +706,15 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
 
           p.showXYTraces(centerX[kMax], -centerY[kMax])
 
-          // p.strokeWeight(5)
-          // let i = 0
-          // var lastPoint
-          // p.colorMode(p.HSB)
-          // p.stroke(1, 1, 1)
-          // for (var pos in path) {
-          //   if (i === 0 || pos.x !== undefined) {
-          //     lastPoint = pos
-          //     i++
-          //   } else {
-          //     p.line(pos.x, -pos.y, lastPoint.x, -lastPoint.y)
-          //     lastPoint = pos
-          //     i++
-          //   }
-          // }
-          p.noFill()
+          p.strokeJoin(p.ROUND)
+          p.stroke(1)
           p.strokeWeight(2)
-          p.colorMode(p.HSB)
-          let i = 0
-          let maxLength
-          var lastPoint = path[0]
+          p.noFill()
+          p.beginShape()
           for (var pos of path) {
-            p.stroke(i / (2 * p.PI), 1, 1)
-            p.line(pos.x, -pos.y, lastPoint.x, -lastPoint.y)
-            lastPoint = pos
-            i += speedSlider.value()
-            if (i > 2 * p.PI) {
-              maxLength = path.length
-              i = 0
-            }
-            path.reverse()
-            while (path.length >= maxLength) {
-              path.pop()
-            }
-            path.reverse()
+            p.vertex(pos.x, -pos.y)
           }
+          p.endShape()
         } else {
         // If 'show' is false, then show the curve
         // approximated by adding terms in the
