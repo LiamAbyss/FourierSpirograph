@@ -2,44 +2,7 @@ html, body {
     height: 100%; 
     width: 100%; 
     margin: 0; 
-    background-color: rgb(153, 153, 153);
-}
-
-select, option, input#imageMargin, input#lt, input#ut {
-    padding: 10px;
-    margin-top: -5px;
-    margin-left: 10px;
-    background-color: rgba(255, 255, 255, 0.8);
-    font-family: inherit;
-    text-overflow: ellipsis;
-    border: 0;
-    width: fit-content;
-}
-
-select#aftermesh, select#premesh{
-    padding: 5px;
-    font-size: 16px;
-    border-right: 5px solid white;
-    line-height: 1;
-    height: 34px;
-    background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #fff;
-    -webkit-appearance: none;
-}
-
-input#uploadImage {
-    margin: 0px -20px;
-}
-
-input[type=number] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-
-input#imageMargin {
-    box-sizing: border-box;
-    width: 40%;
-    text-align: center;
-    margin-top: 5%;
+    background-color: rgb(224, 224, 224);
 }
 
 #global {
@@ -51,6 +14,11 @@ input#imageMargin {
     position: absolute;
     display: flex;
     flex-direction: column;
+    background-color: rgb(150, 51, 34);
+    margin-bottom: 15px;
+    padding-left: 2%;
+    padding-bottom: 5px;
+    overflow: hidden;
 }
 
 #title > h1{
@@ -66,19 +34,18 @@ input#imageMargin {
     margin-top: 0%;
 }
 
-div#title.center-items.center-text {
-    background-color: rgb(150, 51, 34);
-    margin-bottom: 15px;
-    padding-left: 2%;
-    padding-bottom: 5px;
-    overflow: hidden;
+#app {
+    height: 86%;
+    width: 100%;
+    margin-bottom: 1%;
+    position: absolute;
+    bottom: 0px;
 }
 
 div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     background-color: rgb(224, 224, 224);
     font-family: 'Courier New', Courier, monospace;
     font-size: large;
-    border: 10px;
     max-width: 100%;
 }
 
@@ -88,21 +55,77 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     overflow: hidden;
 }
 
- button, .input-button{
-    background-color: rgb(150, 51, 34);
-    font-family: 'Courier New', Courier, monospace;
-    font-size: large;
-    color: white;
-    padding: 15px;
-    border-radius: 3px;
-    border: 3px solid rgb(124, 43, 28);
-    border-right: none;
-    border-top: none;
-    
+#outlineSettings *:not(.thresholdSlider *){
+    margin: 3%;
+}
+
+#outlineSettings {
+    height: 100%;
+    width: 28%;
+    margin-left: 1%;
+    margin-right: 1%;
+    justify-content: space-around;
+}
+
+#uploadedImage {
+    max-width: 80%;
+    max-height: 100px;
+    margin-bottom: 3%;
+}
+
+input#uploadImage {
+    margin: 0px -20px;
+}
+
+select, option, input#imageMargin, input#lt, input#ut {
+    padding: 10px;
+    margin-top: -5px;
+    margin-left: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    font-family: inherit;
+    text-overflow: ellipsis;
+    border: 0;
+    width: fit-content;
+}
+
+select{
+    padding: 5px;
+    font-size: 16px;
+    border-right: 5px solid white;
+    line-height: 1;
+    height: 34px;
+    background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #fff;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+input[type=number] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 input[type="file"] {
     display: none;
+}
+
+input#imageMargin {
+    box-sizing: border-box;
+    width: 40%;
+    text-align: center;
+    margin-top: 5%;
+}
+
+ button, .input-button{
+    cursor: pointer;
+    background-color: rgb(150, 51, 34);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: large;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 3px;
+    border: 3px solid rgb(124, 43, 28);
+    border-right: none;
+    border-top: none;
 }
 
 button:hover, .input-button:hover{
@@ -118,27 +141,6 @@ button:active, .input-button:active{
     border-bottom: none;
 }
 
-
-#app {
-    height: 86%;
-    width: 100%;
-    margin-bottom: 1%;
-    position: absolute;
-    bottom: 0px;
-}
-
-#outlineSettings *:not(.thresholdSlider *){
-    margin: 3%;
-}
-
-#outlineSettings {
-    height: 100%;
-    width: 28%;
-    margin-left: 1%;
-    margin-right: 1%;
-    justify-content: space-around;
-}
-
 #outlineResults {
     display: flex;
     flex-flow: column;
@@ -148,17 +150,11 @@ button:active, .input-button:active{
     height: 100%;
     width: 69%;
     margin-right: 1%;
-    
+    border-left: solid 2px rgb(153, 153, 153)
 }
 
 #sketchCanvas{
     margin-bottom: 5%;
-}
-
-#uploadedImage {
-    max-width: 80%;
-    max-height: 100px;
-    margin-bottom: 3%;
 }
 
 #thresholdSlider {
@@ -219,12 +215,8 @@ button:active, .input-button:active{
     text-align: center;
 }
 
-
-
 /* Settings Sidebar */
 .sidebar {
-    display: flex;
-    flex-direction: column;
     align-items: stretch;
     height: 100%;
     width: 0;
@@ -235,6 +227,7 @@ button:active, .input-button:active{
     background-color: rgb(153, 153, 153);;
     overflow-x: hidden;
     transition: 0.2s;
+    color: white;
 }
 
 .sidebar *{
@@ -248,8 +241,6 @@ button:active, .input-button:active{
 
 #settingsDiv{
     margin: 0px;
-    display: flex;
-    flex-direction: column;
 }
 
 #buttonsDiv{
@@ -270,40 +261,11 @@ button:active, .input-button:active{
     border-left: none;
     border-bottom: none;
 }
-  
-.sidebar a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-}
-
-.sidebar a:hover {
-    color: #f1f1f1;
-}
-
-.sidebar .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-}
 
 .openbtn {
-    font-size: 20px;
-    cursor: pointer;
-    background-color: rgb(150, 51, 34);
-    font-family: 'Courier New', Courier, monospace;
-    font-size: large;
-    color: white;
-    padding: 10px 15px;
     margin: 3%;
     margin-bottom: 1%;
-}
-
+}   
 
 @media screen and (max-height: 450px) {
     .sidebar {padding-top: 15px;}
