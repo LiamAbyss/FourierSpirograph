@@ -742,7 +742,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       } else if (manualPath.length > 0 && manualPath[manualPath.length - 1] === lastManualPath) {
         // resolve manual path
         data = sortDataFromManualPathArray(data)
-        p.setSetup(false)
+        p.resetSketch(false)
         manualPath.push([])
         console.log(manualPath)
         console.log('Finished tracing path')
