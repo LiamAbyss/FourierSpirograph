@@ -49,7 +49,7 @@ const getText = (url) => {
   }
 }
 
-getText('../dist/app/autoThresholds.csv')
+getText('../public/app/autoThresholds.csv')
 
 const meshOutlinePixels = (data, margin) => {
   if (data === undefined || data.length === 0) return
@@ -245,7 +245,7 @@ window.onload = () => {
   // worker finds edges
   let worker
   function initWorker () {
-    worker = new Worker('../dist/outline/worker.js')
+    worker = new Worker('../public/outline/worker.js')
     worker.addEventListener('message', onWorkerMessage, false)
   }
 

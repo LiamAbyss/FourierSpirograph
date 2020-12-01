@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-importScripts('/dist/outline/main.js')
+importScripts('/public/outline/main.js')
 self.appData = {}
 self.addEventListener('message', function (e) {
   const data = e.data

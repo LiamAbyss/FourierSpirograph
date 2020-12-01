@@ -17,7 +17,7 @@ const $cancel = document.querySelector('.js_cancel')
 const $result = document.querySelector('.result')
 let worker
 function initWorker () {
-  worker = new Worker('/dist/outline/worker.js')
+  worker = new Worker('/public/outline/worker.js')
   worker.addEventListener('message', onWorkerMessage, false)
 }
 $file.addEventListener('change', event => {

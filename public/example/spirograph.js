@@ -225,7 +225,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     // preload table data
     p.preload = () => {
       if (uri === undefined) {
-        uri = '../dist/example/datapts.csv'
+        uri = '../public/example/datapts.csv'
       }
       data = p.loadTable(uri, 'csv', 'header')
     }
