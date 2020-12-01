@@ -68,12 +68,6 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
   }
 
   const removeFromArray = (array, item) => {
-    /* const buffer = []
-    for (let j = 0; j < array.length; j++) {
-      if (array[j] !== item) {
-        buffer.push(array[j])
-      }
-    } */
     return array.filter(elt => {
       return elt !== item
     })
