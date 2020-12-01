@@ -10,6 +10,11 @@ exports.sendIndexHtml = (req, res) => {
   res.sendFile(path.resolve('./public/app/index.html'))
 }
 
+exports.sendUtilsJs = (req, res) => {
+  res.status(200)
+  res.sendFile(path.resolve('./public/app/utils.js'))
+}
+
 exports.sendIndexJs = (req, res) => {
   res.status(200)
   res.sendFile(path.resolve('./public/app/index.js'))

@@ -73,6 +73,7 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     margin-bottom: 3%;
 }
 
+/* Interactables */
 input#uploadImage {
     margin: 0px -20px;
 }
@@ -140,6 +141,7 @@ button:active, .input-button:active{
     border-left: none;
     border-bottom: none;
 }
+/* -------------------- */
 
 #outlineResults {
     display: flex;
@@ -192,6 +194,7 @@ button:active, .input-button:active{
     max-width: 10%;
 }
 
+/* Utility classes */
 .flex-col {
     display: flex;
     flex-direction: column;
@@ -214,6 +217,7 @@ button:active, .input-button:active{
 .center-text {
     text-align: center;
 }
+/* -------------------- */
 
 /* Settings Sidebar */
 .sidebar {
@@ -271,3 +275,4 @@ button:active, .input-button:active{
     .sidebar {padding-top: 15px;}
     .sidebar a {font-size: 18px;}
 }
+/* -------------------- */
