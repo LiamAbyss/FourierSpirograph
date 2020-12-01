@@ -101,10 +101,10 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       }
       pairs.push({
         data: newData[i],
-        path: point
+        path: point //  the point of the path corresponding to the nearest distance of point[i] in newdata and push two in pairs
       })
     }
-
+    // Order locals points in localOrder 
     for (let i = 0; i < path.length; i++) {
       const localOrder = []
       for (let j = 0; j < pairs.length; j++) {
@@ -112,17 +112,18 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
           localOrder.push(pairs[j])
         }
       }
+      // ordered points in localorder
       localOrder.sort((a, b) => {
         if (distance(a.data, a.path) < distance(b.data, b.path)) {
           return -1
         } else return 1
       })
-
+      //And Add her in orderedPoints
       for (let j = 0; j < localOrder.length; j++) {
         orderedPoints.push(localOrder[j].data)
       }
     }
-
+    //Clear the data
     data.clearRows()
     for (let i = 0; i < orderedPoints.length; i++) {
       const newRow = data.addRow()
@@ -131,6 +132,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     }
     return data
   }
+  //Use path Ending
   // finds the nearest point in a table
   const nearestPoint = (point, pointsTable) => {
     if (pointsTable === undefined || pointsTable.length === 0) return
