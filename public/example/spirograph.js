@@ -89,14 +89,15 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         y: data.getNum(i, 'y')
       })
     }
-    console.log({ newData })
 
+    // Map every manual path with the corresponding points of the data
     let orderedPointsFromPaths = []
     manualPath.forEach(path => {
       orderedPointsFromPaths.push(sortDataFromManualPath(newData, path, false))
       if (orderedPointsFromPaths[orderedPointsFromPaths.length - 1].length === 0) error = true
     })
-    // Erase path if overridden
+
+    // Prepare to erase path if overridden
     const toErase = []
     for (let i = 0; i < orderedPointsFromPaths.length; i++) {
       for (let j = i + 1; j < orderedPointsFromPaths.length; j++) {
@@ -108,13 +109,13 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         }
       }
     }
-    console.log(toErase)
+
+    // Erase those paths
     toErase.forEach((index) => {
       orderedPointsFromPaths = removeFromArray(orderedPointsFromPaths, orderedPointsFromPaths[index])
       manualPath = removeFromArray(manualPath, manualPath[index])
     })
     if (error) return data
-    console.log('erased')
 
     // Order all sections of points
     let remainingPoints = newData
@@ -126,6 +127,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       let currentIndex = -1
       let newSection = []
 
+      // Get the index of the closest path from the last point in the sections
+      // And prepare the section between two manual paths
       for (let j = 0; j < pseudoOrderedPoints.length; j++) {
         for (let k = 0; k < orderedPointsFromPaths.length; k++) {
           if (pseudoOrderedPoints[j] === orderedPointsFromPaths[k][0]) {
@@ -137,21 +140,26 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         newSection.push(pseudoOrderedPoints[j])
       }
       if (currentIndex === -1) return data
+
       orderedPointsFromPaths.forEach(path => {
         path.forEach(point => {
           if (!newSection.includes(point)) return
           newSection = removeFromArray(newSection, point)
         })
       })
-      console.log(manualPath.length, currentIndex)
+
+      // Append the new sections
       if (newSection.length > 0) sections.push(newSection)
       sections.push(orderedPointsFromPaths[currentIndex])
+
+      // Remove points which are already in one of the sections
       orderedPointsFromPaths[currentIndex].forEach((elt) => {
         remainingPoints = removeFromArray(remainingPoints, elt)
       })
       newSection.forEach((elt) => {
         remainingPoints = removeFromArray(remainingPoints, elt)
       })
+
       last = nearestPoint(orderedPointsFromPaths[currentIndex][orderedPointsFromPaths[currentIndex].length - 1], remainingPoints)
 
       console.log('end')
@@ -162,10 +170,10 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     for (let i = 0; i < sections.length; i++) {
       orderedPoints.push(...sections[i])
     }
+
+    // Push the remaining points
     const endOrderedPoints = sortPointsInOrder(remainingPoints, last)
     orderedPoints.push(...remainingPoints)
-
-    console.log({ orderedPoints })
 
     data.clearRows()
     for (let i = 0; i < orderedPoints.length; i++) {
@@ -176,7 +184,7 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     return data
   }
 
-  // find the path from manual input on the canvas
+  // Find the path from manual input on the canvas
   const sortDataFromManualPath = (data, path, end) => {
     const orderedPoints = []
     const newData = []
@@ -190,7 +198,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
     } else newData.push(...data)
     const unused = []
     const pairs = []
-    // Pair each point of data with the closest point of manual path
+
+    // Map each point of data with the closest point of manual path
     for (let i = 0; i < newData.length; i++) {
       let minDist = Infinity
       let point = {
@@ -214,7 +223,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
         unused.push(newData[i])
       }
     }
-    // Order locals points in localOrder
+
+    // Order locals points
     for (let i = 0; i < path.length; i++) {
       const localOrder = []
       for (let j = 0; j < pairs.length; j++) {
@@ -222,13 +232,15 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
           localOrder.push(pairs[j])
         }
       }
-      // ordered points in localorder
+
+      // Sort points in localorder by distance
       localOrder.sort((a, b) => {
         if (distance(a.data, a.path) < distance(b.data, b.path)) {
           return -1
         } else return 1
       })
-      // And Add her in orderedPoints
+
+      // And push the local order
       for (let j = 0; j < localOrder.length; j++) {
         orderedPoints.push(localOrder[j].data)
       }
@@ -250,7 +262,8 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       return data
     } else return orderedPoints
   }
-  // finds the nearest point in a table
+
+  // Finds the nearest point from a given point in a table
   const nearestPoint = (point, pointsTable) => {
     if (pointsTable === undefined || pointsTable.length === 0) return
     let currentDist = 0
@@ -267,6 +280,21 @@ const launchSpirograph = (uri, parent, tracePath, canvasWidth, canvasHeight) => 
       }
     }
     return nearest
+  }
+
+  // Returns the total distance of a closed path
+  const getPathDistance = (path) => {
+    let dist = distance(path[0], path[path.length - 1])
+    let lastPoint
+    path.forEach((point) => {
+      if (lastPoint === undefined) {
+        lastPoint = point
+        return
+      }
+      dist += distance(lastPoint, point)
+      lastPoint = point
+    })
+    return dist
   }
 
   // Sort Points in a dataset so that each point is the nearest from its neighbour
