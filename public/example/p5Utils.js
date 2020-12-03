@@ -36,15 +36,16 @@ const sortDataFromManualPathArray = (data) => {
       y: data.getNum(i, 'y')
     })
   }
-  console.log({ newData })
 
+  // Map every manual path with the corresponding points of the data
   let orderedPointsFromPaths = []
   // eslint-disable-next-line no-undef
   manualPath.forEach(path => {
     orderedPointsFromPaths.push(sortDataFromManualPath(newData, path, false))
     if (orderedPointsFromPaths[orderedPointsFromPaths.length - 1].length === 0) error = true
   })
-  // Erase path if overridden
+
+  // Prepare to erase path if overridden
   const toErase = []
   for (let i = 0; i < orderedPointsFromPaths.length; i++) {
     for (let j = i + 1; j < orderedPointsFromPaths.length; j++) {
@@ -56,14 +57,14 @@ const sortDataFromManualPathArray = (data) => {
       }
     }
   }
-  console.log(toErase)
+
+  // Erase those paths
   toErase.forEach((index) => {
     orderedPointsFromPaths = removeFromArray(orderedPointsFromPaths, orderedPointsFromPaths[index])
     // eslint-disable-next-line no-undef
     manualPath = removeFromArray(manualPath, manualPath[index])
   })
   if (error) return data
-  console.log('erased')
 
   // Order all sections of points
   let remainingPoints = newData
@@ -75,6 +76,8 @@ const sortDataFromManualPathArray = (data) => {
     let currentIndex = -1
     let newSection = []
 
+    // Get the index of the closest path from the last point in the sections
+    // And prepare the section between two manual paths
     for (let j = 0; j < pseudoOrderedPoints.length; j++) {
       for (let k = 0; k < orderedPointsFromPaths.length; k++) {
         if (pseudoOrderedPoints[j] === orderedPointsFromPaths[k][0]) {
@@ -83,6 +86,7 @@ const sortDataFromManualPathArray = (data) => {
         }
       }
       if (currentIndex !== -1) break
+
       newSection.push(pseudoOrderedPoints[j])
     }
     if (currentIndex === -1) return data
@@ -92,31 +96,31 @@ const sortDataFromManualPathArray = (data) => {
         newSection = removeFromArray(newSection, point)
       })
     })
-    // eslint-disable-next-line no-undef
-    console.log(manualPath.length, currentIndex)
+
+    // Append the new sections
     if (newSection.length > 0) sections.push(newSection)
     sections.push(orderedPointsFromPaths[currentIndex])
+
+    // Remove points which are already in one of the sections
     orderedPointsFromPaths[currentIndex].forEach((elt) => {
       remainingPoints = removeFromArray(remainingPoints, elt)
     })
     newSection.forEach((elt) => {
       remainingPoints = removeFromArray(remainingPoints, elt)
     })
-    last = nearestPoint(orderedPointsFromPaths[currentIndex][orderedPointsFromPaths[currentIndex].length - 1], remainingPoints)
 
-    console.log('end')
+    last = nearestPoint(orderedPointsFromPaths[currentIndex][orderedPointsFromPaths[currentIndex].length - 1], remainingPoints)
   }
 
   // Join the sections
-  console.log(sections)
   for (let i = 0; i < sections.length; i++) {
     orderedPoints.push(...sections[i])
   }
+
+  // Push the remaining points
   // eslint-disable-next-line no-unused-vars
   const endOrderedPoints = sortPointsInOrder(remainingPoints, last)
   orderedPoints.push(...remainingPoints)
-
-  console.log({ orderedPoints })
 
   data.clearRows()
   for (let i = 0; i < orderedPoints.length; i++) {
@@ -127,7 +131,7 @@ const sortDataFromManualPathArray = (data) => {
   return data
 }
 
-// find the path from manual input on the canvas
+// Find the path from manual input on the canvas
 const sortDataFromManualPath = (data, path, end) => {
   const orderedPoints = []
   const newData = []
@@ -141,7 +145,8 @@ const sortDataFromManualPath = (data, path, end) => {
   } else newData.push(...data)
   const unused = []
   const pairs = []
-  // Pair each point of data with the closest point of manual path
+
+  // Map each point of data with the closest point of manual path
   for (let i = 0; i < newData.length; i++) {
     let minDist = Infinity
     let point = {
@@ -149,6 +154,8 @@ const sortDataFromManualPath = (data, path, end) => {
       y: 0
     }
     let currentDist = 0
+
+    // Order local points
     for (let j = 0; j < path.length; j++) {
       currentDist = distance(newData[i], path[j])
       if (currentDist < minDist && currentDist < 7) {
@@ -173,13 +180,15 @@ const sortDataFromManualPath = (data, path, end) => {
         localOrder.push(pairs[j])
       }
     }
-    // ordered points in localorder
+
+    // Sort points in localorder by distance
     localOrder.sort((a, b) => {
       if (distance(a.data, a.path) < distance(b.data, b.path)) {
         return -1
       } else return 1
     })
-    // And Add her in orderedPoints
+
+    // And push the local order
     for (let j = 0; j < localOrder.length; j++) {
       orderedPoints.push(localOrder[j].data)
     }
@@ -201,7 +210,8 @@ const sortDataFromManualPath = (data, path, end) => {
     return data
   } else return orderedPoints
 }
-// finds the nearest point in a table
+
+// Finds the nearest point from a given point in a table
 const nearestPoint = (point, pointsTable) => {
   if (pointsTable === undefined || pointsTable.length === 0) return
   let currentDist = 0
@@ -218,6 +228,22 @@ const nearestPoint = (point, pointsTable) => {
     }
   }
   return nearest
+}
+
+// Returns the total distance of a closed path
+// eslint-disable-next-line no-unused-vars
+const getPathDistance = (path) => {
+  let dist = distance(path[0], path[path.length - 1])
+  let lastPoint
+  path.forEach((point) => {
+    if (lastPoint === undefined) {
+      lastPoint = point
+      return
+    }
+    dist += distance(lastPoint, point)
+    lastPoint = point
+  })
+  return dist
 }
 
 // Sort Points in a dataset so that each point is the nearest from its neighbour
