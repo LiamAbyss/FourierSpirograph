@@ -10,6 +10,11 @@ exports.sendCamJs = (req, res) => {
   res.sendFile(path.resolve('./public/example/Cam.js'))
 }
 
+exports.sendP5UtilsJs = (req, res) => {
+  res.status(200)
+  res.sendFile(path.resolve('./public/example/p5Utils.js'))
+}
+
 exports.sendSpirographJs = (req, res) => {
   res.status(200)
   res.sendFile(path.resolve('./public/example/spirograph.js'))
