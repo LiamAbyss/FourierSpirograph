@@ -10,9 +10,17 @@ const gaussMatrix = [
   [0.0261, 0.0561, 0.0724, 0.0561, 0.0261],
   [0.0121, 0.0261, 0.0337, 0.0261, 0.0121]
 ]
+// kernel matrix for x and y derivation
 const xMatrix = [[1, 0, -1], [2, 0, -2], [1, 0, -1]]
 const yMatrix = [[-1, -2, -1], [0, 0, 0], [1, 2, 1]]
 const MAX_IMAGE_HEIGHT = 300
+
+/**
+ * Function for currying other functions.
+ * @param   {function}  f  - The function to be curried
+ * @param   {number}    n  - Parameter for defining arguments
+ * @return  {function}  Curried function
+ */
 function curry (f, n) {
   var args = Array.prototype.slice.call(arguments, 0)
   if (typeof n === 'undefined') { args[1] = f.length }
@@ -21,6 +29,12 @@ function curry (f, n) {
     return curry.apply(undefined, args.concat(Array.prototype.slice.call(arguments, 0)))
   }
 }
+
+/**
+ * Loads an image from its url.
+ * @param   {String}  imageUrl  - The url of the image
+ * @return  {Promise<Element>}  Resulting image Element
+ */
 function loadImage (imageUrl) {
   return new Promise((resolve, reject) => {
     console.time('loadImage')
@@ -33,6 +47,12 @@ function loadImage (imageUrl) {
     }
   })
 }
+
+/**
+ * Reads a file from its url.
+ * @param   {Blob}  file   - Url of the file to be red
+ * @return  {Promise<String|ArrayBuffer>} File content
+ */
 function readFileAsDataURL (file) {
   return new Promise((resolve, reject) => {
     var reader = new FileReader()
@@ -46,11 +66,25 @@ function readFileAsDataURL (file) {
     }
   })
 }
+
+/**
+ * Draws the given image on the canvas.
+ * @param   {Element}   canvas
+ * @param   {Element}   image
+ * @return  {Element}   The image given as parameters
+ */
 function _drawImageOnCanvas (canvas, image) {
   canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height)
   return image
 }
 var drawImageOnCanvas = curry(_drawImageOnCanvas)
+
+/**
+ * Sets the canvas size from the image's one.
+ * @param   {Element}  canvas
+ * @param   {Element}  image   [image description]
+ * @return  {Element} The image given as parameter
+ */
 function _setCanvasSizeFromImage (canvas, image) {
   const ratio = image.naturalWidth / image.naturalHeight
   var MAX_WIDTH = 400
@@ -78,12 +112,28 @@ function _setCanvasSizeFromImage (canvas, image) {
   return image
 }
 var setCanvasSizeFromImage = curry(_setCanvasSizeFromImage)
+
+/**
+ * Draws a given image on the canvas.
+ * @param   {number}  width   - The image width
+ * @param   {number}  height  - The image height
+ * @param   {Element}  canvas
+ * @param   {number[]}  bytes   - The image as bytes array
+ */
 function _drawBytesOnCanvas (width, height, canvas, bytes) {
   canvas
     .getContext('2d')
     .putImageData(new ImageData(new Uint8ClampedArray(bytes), width, height), 0, 0)
 }
 var drawBytesOnCanvas = curry(_drawBytesOnCanvas)
+
+/**
+ * Puts to grayscale a given image.
+ * @param   {number[]}  bytes   - Image to be filtered
+ * @param   {number}    width   - The image width
+ * @param   {number}    height  - The image height
+ * @return  {number[]}  Grayscaled image
+ */
 function toGrayscale (bytes, width, height) {
   console.time('toGrayscale')
   const grayscale = []
@@ -94,6 +144,16 @@ function toGrayscale (bytes, width, height) {
   console.timeEnd('toGrayscale')
   return grayscale
 }
+
+/**
+ * Applies convolution to an image with a filter kernel.
+ * @param   {number}      width   - Image width
+ * @param   {number}      height  - Image height
+ * @param   {number[][]}  kernel  - 2D matrix filter to be convoluted with the image
+ * @param   {number}      radius  - Limit of inner coordinates (dx and dy)
+ * @param   {number[]}    bytes   - The image as byte array to be convoluted
+ * @return  {number[]}    The filtered image
+ */
 function _toConvolution (width, height, kernel, radius, bytes) {
   console.time('toConvolution')
   const convolution = []
@@ -117,8 +177,9 @@ function _toConvolution (width, height, kernel, radius, bytes) {
   return convolution
 }
 const toConvolution = curry(_toConvolution)
+
 /**
- * From image bytes (0 - 255) to values between 0 and 1
+ * From image bytes (0 - 255) to values between 0 and 1.
  * @param  {Array<number>} bytes
  * @return {Array}      normalized values
  */
@@ -131,11 +192,11 @@ function toNormalized (bytes) {
   console.timeEnd('toNormalized')
   return normalized
 }
+
 /**
- * From normalized array that has values from 0 to 1
- * to image data with values between 0 and 255
+ * From normalized array that has values from 0 to 1 to image data with values between 0 and 255.
  * @param  {Array}  normalized
- * @return {Array}  denormlized
+ * @return {Array}  Denormalized
  */
 function toDenormalized (normalized) {
   console.time('toDenormalized')
@@ -143,6 +204,23 @@ function toDenormalized (normalized) {
   console.timeEnd('toDenormalized')
   return denormalized
 }
+
+/**
+* @typedef {Object} GradientMagnitude
+* @property {number[]} data - The gradient magnitude
+* @property {{ut:number, lt:number}} threshold - Upper and lower threshold
+*/
+
+/**
+ * Calculates the gradient magnitudes of an image given its derivated values in x and y.
+ * @param   {number[]}  xDerived  - X derivated image
+ * @param   {number[]}  yDerived  - Y derivated image
+ * @param   {number}  width       - Image width
+ * @param   {number}  height      - Image height
+ * @param   {number}  lt          - Upper threshold
+ * @param   {number}  ut          - Lower threshold
+ * @return  {GradientMagnitude}   The gradient magnitude data and associated threshold
+ */
 function toGradientMagnitude (xDerived, yDerived, width, height, lt = 0, ut = 0) {
   console.time('toGradientMagnitude')
   const gradientMagnitude = []
@@ -168,7 +246,7 @@ function toGradientMagnitude (xDerived, yDerived, width, height, lt = 0, ut = 0)
   const max = getMax(gradientMagnitude)
   const gradientMagnitudeCapped = gradientMagnitude.map(x => x / max)
   if (!ut && !lt) {
-    const res = getTresholds(gradientMagnitudeCapped)
+    const res = getThresholds(gradientMagnitudeCapped)
     ut = res.ut
     lt = res.lt
   }
@@ -239,10 +317,22 @@ function toGradientMagnitude (xDerived, yDerived, width, height, lt = 0, ut = 0)
     }
   }
 }
+
+/**
+ * Gets the max value of an array.
+ * @param   {number[]} values
+ * @return  {number}   Max value
+ */
 function getMax (values) {
   return values.reduce((prev, now) => now > prev ? now : prev, -1)
 }
-function getTresholds (gradientMagnitude) {
+
+/**
+ * Gets the threshold of a given gradient magnitude array.
+ * @param   {number[]}  gradientMagnitude - The gradient magnitude of the image
+ * @return  {{ut:number, lt:number}} The upper and lower thresholds
+ */
+function getThresholds (gradientMagnitude) {
   let sum = 0
   let count = 0
   sum = gradientMagnitude.reduce((memo, x) => x + memo, 0)
@@ -251,12 +341,12 @@ function getTresholds (gradientMagnitude) {
   const lt = 0.4 * ut
   return { ut, lt }
 }
+
 /**
  * Takes an array of values (0-255) and returns
  * an expaneded array [x, x, x, 255] for each value.
- *
  * @param  {Array}  values
- * @return {Array}  expanded values
+ * @return {Array}  Expanded values
  */
 function toPixels (values) {
   console.time('toPixels')

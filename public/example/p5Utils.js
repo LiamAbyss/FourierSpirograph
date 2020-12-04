@@ -2,7 +2,7 @@
  * Finds and remove a given item from a given list.
  * Does nothing if the item is not in the list.
  * @param {any[]} array - The array to remove from
- * @param {*} item - The item to b removed
+ * @param {*} item The item to be removed
  */
 const removeFromArray = (array, item) => {
   return array.filter(elt => {
@@ -21,8 +21,9 @@ const distance = (a, b) => {
 }
 
 /**
- *
+ * Orders the points according to the path drawn on the canvas.
  * @param {Table} data - A p5 table containing points
+ * @returns The oredered data
  */
 // eslint-disable-next-line no-unused-vars
 const sortDataFromManualPathArray = (data) => {
@@ -131,7 +132,13 @@ const sortDataFromManualPathArray = (data) => {
   return data
 }
 
-// Find the path from manual input on the canvas
+/**
+ * Finds the path from a manual input on the canvas.
+ * @param   {Table}    data  - A p5 table containing points
+ * @param   {Point[]}  path  - Path drawn by the user
+ * @param   {Boolean}  end   -
+ * @return  {Table | Point[]} The ordered points
+ */
 const sortDataFromManualPath = (data, path, end) => {
   const orderedPoints = []
   const newData = []
@@ -211,7 +218,12 @@ const sortDataFromManualPath = (data, path, end) => {
   } else return orderedPoints
 }
 
-// Finds the nearest point from a given point in a table
+/**
+ * Finds the nearest point from a given point in a table.
+ * @param   {Point}    point - The reference point
+ * @param   {Point[]}  pointsTable - Array containing all points
+ * @return  {Point}    The nearest point
+ */
 const nearestPoint = (point, pointsTable) => {
   if (pointsTable === undefined || pointsTable.length === 0) return
   let currentDist = 0
@@ -230,7 +242,11 @@ const nearestPoint = (point, pointsTable) => {
   return nearest
 }
 
-// Returns the total distance of a closed path
+/**
+ * Gets the total distance of a given closed path.
+ * @param   {Point[]}  path - The closed path
+ * @return  {[type]}   The total distance
+ */
 // eslint-disable-next-line no-unused-vars
 const getPathDistance = (path) => {
   let dist = distance(path[0], path[path.length - 1])
@@ -246,7 +262,12 @@ const getPathDistance = (path) => {
   return dist
 }
 
-// Sort Points in a dataset so that each point is the nearest from its neighbour
+/**
+ * Sort points in a dataset so that each point is the nearest from its neighbour.
+ * @param   {Point[]}  data   - Points table
+ * @param   {Point}    first  - Defined start for the sort
+ * @return  {Point[]}  The ordered points
+ */
 const sortPointsInOrder = (data, first) => {
   const newData = []
   if (data.getRowCount !== undefined) {

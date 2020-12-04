@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 window.appData = {}
+
 const canvasFrom = document.querySelector('.image--from')
 const canvasGrayscale = document.querySelector('.image--grayscale')
 const canvasResult = document.querySelector('.image--result')
@@ -15,11 +16,14 @@ const $ut = document.querySelector('.js_ut')
 const $lt = document.querySelector('.js_lt')
 const $cancel = document.querySelector('.js_cancel')
 const $result = document.querySelector('.result')
+
 let worker
+
 function initWorker () {
   worker = new Worker('/public/outline/worker.js')
   worker.addEventListener('message', onWorkerMessage, false)
 }
+
 $file.addEventListener('change', event => {
   const file = $file.files[0]
   readFileAsDataURL(file)
@@ -47,6 +51,7 @@ $file.addEventListener('change', event => {
     })
     .then(showControls)
 })
+
 $submit.addEventListener('click', event => {
   window.appData.ut = parseFloat($ut.value)
   window.appData.lt = parseFloat($lt.value)
@@ -69,6 +74,7 @@ $submit.addEventListener('click', event => {
   resetImageNav()
   worker.postMessage({ cmd: 'imgData', data: pixels })
 })
+
 $cancel.addEventListener('click', event => {
   worker.terminate()
   worker.removeEventListener('message', onWorkerMessage, false)
@@ -77,6 +83,7 @@ $cancel.addEventListener('click', event => {
   initWorker()
   resetImageNav()
 })
+
 function showControls () {
   $status.style.display = 'inline-block'
   $controls.style.display = 'inline-block'
@@ -85,22 +92,27 @@ function showControls () {
   resetImageNav()
   setProcessingStatus('Waiting for start.')
 }
+
 function blockControls () {
   $controls.classList.add('controls--blocked')
   $cancel.style.display = 'inline-block'
 }
+
 function unblockControls () {
   $controls.classList.remove('controls--blocked')
   $cancel.style.display = ''
 }
+
 function resetImageNav () {
   [...document.querySelectorAll('.image-nav__item--active')].forEach(el => el.classList.remove('image-nav__item--active'))
   document.querySelector('[data-target="js_image--from"]').classList.add('image-nav__item--active')
 }
+
 function setProcessingStatus (status) {
   window.appData.status = status
   $status.innerText = status
 }
+
 function activateImage (className) {
   const imageNavItem = document.querySelector(`[data-target="${className}"]`)
   if (imageNavItem) {
@@ -108,10 +120,12 @@ function activateImage (className) {
   }
   document.querySelector(`.${className}`).classList.add('image--active')
 }
+
 function showThresholds (thresh) {
   $ut.value = thresh.ut
   $lt.value = thresh.lt
 }
+
 function onWorkerMessage (e) {
   const drawBytesOnCanvasForImg = drawBytesOnCanvas(window.appData.width, window.appData.height)
   if (e.data.type === 'grayscale') {
@@ -141,6 +155,7 @@ function onWorkerMessage (e) {
     unblockControls()
   }
 }
+
 document.querySelector('.js_image-nav').addEventListener('click', e => {
   const eventTarget = e.target
   if (eventTarget.classList.contains('image-nav__item--active')) {
