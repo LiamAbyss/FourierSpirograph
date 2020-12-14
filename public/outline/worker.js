@@ -1,6 +1,8 @@
 /* eslint-disable no-undef */
-importScripts('/dist/outline/main.js')
+importScripts('/public/outline/main.js')
+
 self.appData = {}
+
 self.addEventListener('message', function (e) {
   const data = e.data
   switch (data.cmd) {
@@ -14,6 +16,7 @@ self.addEventListener('message', function (e) {
       break
   }
 })
+
 function start () {
   const toConvolutionForImg = toConvolution(self.appData.width, self.appData.height)
   const grayscale = toPixels(toGrayscale(self.imgData, self.appData.width, self.appData.height))

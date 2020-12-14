@@ -2,28 +2,34 @@
 <html lang="en">
     <head>
       <meta charset="utf-8"/>
-      <title>Fourier Spirograph Alpha v0.3.1</title>
-      <link rel="stylesheet" href="/dist/app/index.css"/>
-      <script src="/dist/lib/nouislider.js"></script>
-      <link rel="stylesheet" href="/dist/lib/nouislider.css"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <title>Fourier Spirograph Alpha v0.4.1</title>
+      <link rel="stylesheet" href="/public/app/index.css"/>
+      <link rel="stylesheet" href="/public/lib/nouislider.css"/>
+      <script type="text/javascript" src="/public/app/utils.js"></script>
+      <script type="text/javascript" src="/public/example/p5Utils.js"></script>
+      <script src="/public/lib/nouislider.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.min.js"> </script>
-      <script src="/dist/example/Cam.js"> </script>      
-      <script src="/dist/example/spirograph.js"> </script>      
-      <script src="/dist/outline/main.js"></script>
-      <script type="text/javascript" src="/dist/app/index.js"></script>
+      <script src="/public/example/Cam.js"> </script>      
+      <script src="/public/example/spirograph.js"> </script>      
+      <script src="/public/outline/main.js"></script>
+      <script type="text/javascript" src="/public/app/index.js"></script>
     </head>
     <body>
-        <div id="global" class="flex-col space-between">
+        <div id="global" class="flex-col">
             <div id="title" class="center-items center-text">
                 <h1 class="center-text">Fourier Spirograph</h1>
-                <p> Alpha v0.3.1</p>
+                <p> Alpha v0.4.1</p>
             </div>
             <div id="app" class="flex-row">
                 <div id="outlineSettings" class="flex-col center-items">
                     <div class="flex-col center-items">
                         <img id="uploadedImage" src="" alt="Choose image"/>
+                        <label for="uploadImage" class="input-button">
+                            Upload image 
+                        </label>
                         <input type="file" id="uploadImage" accept="image/*"/>
-                        <div>
+                        <div id="imageMarginDiv" class="center-text">
                             <label for="imageMargin">Margin</label>
                             <input type="number" id="imageMargin" name="imageMargin" min="0" value="0"/>
                         </div>
@@ -31,18 +37,20 @@
                     <div id="thresholdSlider"></div>
                     <div id="autoThresholdSlider"></div>
                     <div class="center-text" id="thresholdChoices">
-                        <label for="lt">Lower Threshold</label>
+                        <label for="lt">Lower Threshold :</label>
                         <input type="text" id="lt">
-                        <label for="ut">Upper Threshold</label>
+                        <br>
+                        <br>    
+                        <label for="ut">Upper Threshold :</label>
                         <input type="text" id="ut">
                     </div>
                     <div>
                         <div class="flex-row">
-                            <label for="premesh">Premesh</label>
+                            <label for="premesh">Premesh :</label>
                             <select name="premesh" id="premesh">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
-                                <option value="4">4</option>
+                                <option value="4" selected>4</option>
                                 <option value="8">8</option>
                                 <option value="16">16</option>
                                 <option value="32">32</option>
@@ -50,11 +58,11 @@
                         </div>
                         <br/>
                         <div class="flex-row">
-                            <label for="aftermesh">Aftermesh</label>
+                            <label for="aftermesh">Aftermesh :</label>
                             <select name="aftermesh" id="aftermesh">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
-                                <option value="4">4</option>
+                                <option value="4" selected>4</option>
                                 <option value="8">8</option>
                                 <option value="16">16</option>
                                 <option value="32">32</option>
@@ -64,7 +72,13 @@
                     <button type="button" id="toggleThreshold">Show automatic threshold choices</button>
                     <button type="button" id="outlineSubmit">Find edges</button>
                 </div>
-                <div id="outlineResults" class="center-items">
+                <div id="outlineResults" class="center-items flex-col">
+                    <div id="settingsSidebar" class="sidebar flex-col center-items">
+                        <div id="settingsDiv" class="flex-col"></div>
+                        <div id="buttonsDiv"></div>
+                    </div>
+                    
+                    <button class="openbtn" onclick="toggleNav()">☰ Open Settings</button>
                     <canvas id="outlineCanvas"></canvas>
                 </div>
             </div>

@@ -7,30 +7,35 @@ exports.redirect = (req, res) => {
 
 exports.sendIndexHtml = (req, res) => {
   res.status(200)
-  res.sendFile(path.resolve('./src/dist/app/index.html'))
+  res.sendFile(path.resolve('./public/app/index.html'))
+}
+
+exports.sendUtilsJs = (req, res) => {
+  res.status(200)
+  res.sendFile(path.resolve('./public/app/utils.js'))
 }
 
 exports.sendIndexJs = (req, res) => {
   res.status(200)
-  res.sendFile(path.resolve('./src/dist/app/index.js'))
+  res.sendFile(path.resolve('./public/app/index.js'))
 }
 
 exports.sendIndexCss = (req, res) => {
   res.status(200)
-  res.sendFile(path.resolve('./src/dist/app/index.css'))
+  res.sendFile(path.resolve('./public/app/index.css'))
 }
 
 exports.sendThresholdsCsv = (req, res) => {
   res.status(200)
-  res.sendFile(path.resolve('./src/dist/app/autoThresholds.csv'))
+  res.sendFile(path.resolve('./public/app/autoThresholds.csv'))
 }
 
 exports.sendNoUiJs = (req, res) => {
   res.status(200)
-  res.sendFile(path.resolve('./src/dist/lib/nouislider.js'))
+  res.sendFile(path.resolve('./public/lib/nouislider.js'))
 }
 
 exports.sendNoUiCss = (req, res) => {
   res.status(200)
-  res.sendFile(path.resolve('./src/dist/lib/nouislider.css'))
+  res.sendFile(path.resolve('./public/lib/nouislider.css'))
 }
