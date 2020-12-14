@@ -10,5 +10,5 @@ app.use(p5Routes)
 app.use(appRoutes)
 
 app.listen(process.env.PORT, function () {
-  console.log('Example app listening on port 3000!')
+  console.log(`App listening on port ${process.env.PORT}!`)
 })
