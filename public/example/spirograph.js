@@ -105,7 +105,7 @@ const sketch = (p) => {
     const importFileInput = p.createFileInput((file) => {
       const newData = p.loadTable(file.data, 'csv', 'header', () => {
         if (file.name.endsWith('.csv')) {
-          p.resetSketch(true, undefined, newData)
+          p.resetSketch(false, undefined, newData)
         } else {
           alert('The selected file doesn\'t have the correct extension\n' +
               'Given extension : .' + file.name.split('.')[1] + '\n' +
@@ -190,6 +190,7 @@ const sketch = (p) => {
         newRow.setNum('y', pos.y)
         p.resetSketch()
       }
+      // 'x' keycode = 88
     } else if (p.keyIsDown(88)) {
       const pos = {
         x: (p.mouseX - cam.world.x) / cam.view.zoom,
@@ -228,6 +229,7 @@ const sketch = (p) => {
       p.ellipse(pos.x, pos.y, weight)
       p.noFill()
       p.strokeWeight(2)
+      // 'f' keycode = 70
     } else if (p.keyIsDown(70)) {
       for (let i = 0; i < size; i++) {
         if (data.getRowCount() < size) return
@@ -242,16 +244,24 @@ const sketch = (p) => {
           })
         }
       }
+      // 'p' keycode = 80
     } else if (p.keyIsDown(80)) {
       // trace manual path
+
+      // Current mouse position, accounting for camera zoom/position
       const pos = {
         x: (p.mouseX - cam.world.x) / cam.view.zoom,
         y: (p.mouseY - cam.world.y) / cam.view.zoom
       }
+
       tmpManualPath = manualPath[manualPath.length - 1]
+
+      // Unique log when the path is started
       if (manualPath.length === 0) {
         console.log('Tracing path...')
       }
+
+      // Prevents pushing the same point multiple times
       if (tmpManualPath.length === 0 || distance(pos, tmpManualPath[tmpManualPath.length - 1]) > 1) {
         tmpManualPath.push(pos)
       }
