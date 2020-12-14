@@ -65,6 +65,7 @@ let lastManualPath = []
 let follow = false
 let multiPaths = false
 let nCircles
+let showPreview = false
 
 const controls = {
   view: { x: 0, y: 0, zoom: 1 },
@@ -134,6 +135,12 @@ const sketch = (p) => {
 
     speedSlider = p.createSlider(0.0001, 0.05, 0.007, 0.0005).parent(settingsDiv)
     speedSlider.id('speedSlider')
+
+    previewCheckbox = p.createCheckbox('Show preview', false).parent(settingsDiv)
+    previewCheckbox.id('previewCheckbox')
+    previewCheckbox.changed(() => {
+      showPreview = !showPreview
+    })
 
     followCheckbox = p.createCheckbox('Follow path', false).parent(settingsDiv)
     followCheckbox.id('followCheckbox')
@@ -306,11 +313,18 @@ const sketch = (p) => {
     kMax = nCircles.value()
 
     // Polygonal curve:
-    // Uncomment if you want to see it.
-    p.noFill()
-    p.stroke(10, 130, 100)
-    p.strokeJoin(p.ROUND)
-    // p.beginShape()
+    if (showPreview) {
+      p.noFill()
+      p.stroke(0.5)
+      p.strokeJoin(p.ROUND)
+      p.beginShape()
+      for (let i = 0; i < size; i++) {
+        const xpos = data.getNum(i, 'x')
+        const ypos = data.getNum(i, 'y')
+        p.vertex(xpos, ypos)
+      }
+      p.endShape(p.CLOSE)
+    }
 
     for (let i = 0; i < size; i++) {
       if (data.getRowCount() < size) return
