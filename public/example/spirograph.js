@@ -141,6 +141,7 @@ const sketch = (p) => {
     previewCheckbox.changed(() => {
       showPreview = !showPreview
     })
+    showPreview = false
 
     followCheckbox = p.createCheckbox('Follow path', false).parent(settingsDiv)
     followCheckbox.id('followCheckbox')
