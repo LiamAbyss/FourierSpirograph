@@ -42,7 +42,7 @@ const sortDataFromManualPathArray = (data) => {
   let orderedPointsFromPaths = []
   // eslint-disable-next-line no-undef
   manualPath.forEach(path => {
-    orderedPointsFromPaths.push(sortDataFromManualPath(newData, path, false))
+    orderedPointsFromPaths.push(sortDataFromManualPath(newData, path, false, 7))
     if (orderedPointsFromPaths[orderedPointsFromPaths.length - 1].length === 0) error = true
   })
 
@@ -134,12 +134,13 @@ const sortDataFromManualPathArray = (data) => {
 
 /**
  * Finds the path from a manual input on the canvas.
- * @param   {Table}    data  - A p5 table containing points
- * @param   {Point[]}  path  - Path drawn by the user
- * @param   {Boolean}  end   -
+ * @param   {Table}    data   - A p5 table containing points
+ * @param   {Point[]}  path   - Path drawn by the user
+ * @param   {Boolean}  end    -
+ * @param   {Number}   radius - The allowed radius around the manual path
  * @return  {Table | Point[]} The ordered points
  */
-const sortDataFromManualPath = (data, path, end) => {
+const sortDataFromManualPath = (data, path, end, radius) => {
   const orderedPoints = []
   const newData = []
   if (data.getRowCount !== undefined) {
@@ -150,6 +151,7 @@ const sortDataFromManualPath = (data, path, end) => {
       })
     }
   } else newData.push(...data)
+  if (radius === undefined) radius = Infinity
   const unused = []
   const pairs = []
 
@@ -165,7 +167,7 @@ const sortDataFromManualPath = (data, path, end) => {
     // Order local points
     for (let j = 0; j < path.length; j++) {
       currentDist = distance(newData[i], path[j])
-      if (currentDist < minDist && currentDist < 7) {
+      if (currentDist < minDist && currentDist < radius) {
         minDist = currentDist
         point = path[j]
       }

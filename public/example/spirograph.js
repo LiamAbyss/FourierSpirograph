@@ -63,6 +63,7 @@ let manualPath = [[]]
 let lastManualPath = []
 
 let follow = false
+let multiPaths = false
 let nCircles
 
 const controls = {
@@ -139,6 +140,15 @@ const sketch = (p) => {
     followCheckbox.changed(() => {
       follow = !follow
     })
+
+    multiPathsCheckbox = p.createCheckbox('Multi-paths', false).parent(settingsDiv)
+    multiPathsCheckbox.id('multiPathsCheckbox')
+    multiPathsCheckbox.changed(() => {
+      multiPaths = !multiPaths
+      manualPath = [[]]
+      lastManualPath = []
+    })
+    multiPaths = false
 
     nCirclesLabel = p.createP('Number of circles : ').parent(settingsDiv)
     nCirclesLabel.id('nCirclesLabel')
@@ -229,21 +239,6 @@ const sketch = (p) => {
       p.ellipse(pos.x, pos.y, weight)
       p.noFill()
       p.strokeWeight(2)
-      // 'f' keycode = 70
-    } else if (p.keyIsDown(70)) {
-      for (let i = 0; i < size; i++) {
-        if (data.getRowCount() < size) return
-        const xpos = data.getNum(i, 'x')
-        const ypos = data.getNum(i, 'y')
-        if ((p.mouseX >= (xpos - 1) * cam.view.zoom + cam.world.x && p.mouseX <= (xpos + 1) * cam.view.zoom + cam.world.x &&
-            p.mouseY >= (ypos - 1) * cam.view.zoom + cam.world.y && p.mouseY <= (ypos + 1) * cam.view.zoom + cam.world.y)) {
-          // set first point
-          p.resetSketch(true, {
-            x: xpos,
-            y: ypos
-          })
-        }
-      }
       // 'p' keycode = 80
     } else if (p.keyIsDown(80)) {
       // trace manual path
@@ -261,7 +256,7 @@ const sketch = (p) => {
         console.log('Tracing path...')
       }
 
-      // Prevents pushing the same point multiple times
+      // Prevents from pushing the same point multiple times
       if (tmpManualPath.length === 0 || distance(pos, tmpManualPath[tmpManualPath.length - 1]) > 1) {
         tmpManualPath.push(pos)
       }
@@ -292,7 +287,11 @@ const sketch = (p) => {
       }
     } else if (manualPath.length > 0 && manualPath[manualPath.length - 1] === lastManualPath) {
       // resolve manual path
-      data = sortDataFromManualPathArray(data)
+      if (multiPaths) data = sortDataFromManualPathArray(data)
+      else {
+        data = sortDataFromManualPath(data, lastManualPath, true)
+        manualPath = [[...lastManualPath]]
+      }
       p.resetSketch(false)
       manualPath.push([])
       console.log(manualPath)
@@ -312,6 +311,7 @@ const sketch = (p) => {
     p.stroke(10, 130, 100)
     p.strokeJoin(p.ROUND)
     // p.beginShape()
+
     for (let i = 0; i < size; i++) {
       if (data.getRowCount() < size) return
       const xpos = data.getNum(i, 'x')
