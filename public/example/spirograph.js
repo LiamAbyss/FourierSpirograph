@@ -101,6 +101,13 @@ const sketch = (p) => {
           rows.map(e => e.join(',')).join('\n')
       const encodedUri = encodeURI(csvContent)
       window.location = encodedUri
+      console.log(encodedUri)
+    })
+
+    exampleButton = p.createButton('Examples').parent(settingsDiv)
+    exampleButton.id('exampleButton')
+    exampleButton.mouseReleased(e => {
+      const childWin = window.open('examples.html', '_blank', 'height=400, width=550')
     })
 
     importButton = p.createButton('Import').parent(buttonsDiv)
@@ -679,6 +686,23 @@ const sketch = (p) => {
     }
     return p.createVector(sumX, sumY)
   }
+}
+
+/**
+ * Import an example
+ * @param {String} uri The uri to load
+ */
+importExample = (_uri) => {
+  if (_uri === undefined) return
+  const newData = s.loadTable(_uri, 'csv', 'header', () => {
+    console.log(newData)
+    s.resetSketch(false, undefined, newData)
+  })
+  /* if (s !== undefined) {
+    s.remove()
+  }
+  // eslint-disable-next-line new-cap
+  s = new p5(sketch) */
 }
 
 // Start drawing the spirograph
