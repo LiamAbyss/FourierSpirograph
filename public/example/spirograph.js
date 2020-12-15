@@ -512,13 +512,12 @@ const sketch = (p) => {
     arrayCy = p.make2Darray(size, size)
     for (var i = 0; i < size; i++) {
       for (var j = 0; j < size; j++) {
-        const scale = 1
-        const COSX = p.cos((j - n) * T[i]) * scale * data.getNum(i, 'x')
-        const SINX = p.sin((j - n) * T[i]) * scale * data.getNum(i, 'y')
+        const COSX = p.cos((j - n) * T[i]) * data.getNum(i, 'x')
+        const SINX = p.sin((j - n) * T[i]) * data.getNum(i, 'y')
         const valX = 1 / size * (COSX + SINX)
         arrayCx[i][j] = valX
-        const COSY = p.cos((j - n) * T[i]) * scale * data.getNum(i, 'y')
-        const SINY = p.sin((j - n) * T[i]) * scale * data.getNum(i, 'x')
+        const COSY = p.cos((j - n) * T[i]) * data.getNum(i, 'y')
+        const SINY = p.sin((j - n) * T[i]) * data.getNum(i, 'x')
         const valY = 1 / size * (COSY - SINY)
         arrayCy[i][j] = valY
       }
@@ -534,12 +533,8 @@ const sketch = (p) => {
       }
     }
 
-    // print(tempCx)
-
     Cx = p.arrayColumnsSum(tempCx)
     Cy = p.arrayColumnsSum(tempCy)
-
-    // print(Cx);
 
     for (i = 0; i < size - ((size + 1) / 2); i++) {
       CPosX[i] = Cx[i + (size + 1) / 2]
@@ -567,11 +562,9 @@ const sketch = (p) => {
 
     for (i = 0; i < size - 1; i++) {
       Rho[i] = p.dist(0, 0, CCordX[i], CCordY[i])
-      if (p.atan2(CCordY[i], CCordX[i]) < 0) {
-        Ang[i] = (p.atan2(CCordY[i], CCordX[i]) + 2 * p.PI) * 180 / (p.PI) // (PI - p.atan2(CCordY[i], CCordX[i]) )/(2*PI);
-      } else {
-        Ang[i] = p.atan2(CCordY[i], CCordX[i]) * 180 / (p.PI)
-      }
+      p.angleMode(p.DEGREES)
+      Ang[i] = p.atan2(CCordY[i], CCordX[i])
+      p.angleMode(p.RADIANS)
     }
 
     // I need to create a list of numbers so I can choose
