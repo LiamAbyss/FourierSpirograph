@@ -9,10 +9,11 @@
       <script type="text/javascript" src="/public/app/utils.js"></script>
       <script type="text/javascript" src="/public/example/p5Utils.js"></script>
       <script src="/public/lib/nouislider.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.min.js"> </script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
       <script src="/public/example/Cam.js"> </script>      
       <script src="/public/example/spirograph.js"> </script>      
       <script src="/public/outline/main.js"></script>
+      <script type="text/javascript" src="/public/app/examples.js"></script>
       <script type="text/javascript" src="/public/app/index.js"></script>
     </head>
     <body>
@@ -57,7 +58,7 @@
                             </select>
                         </div>
                         <br/>
-                        <div class="flex-row">
+                        <div class="flex-row" style="white-space: nowrap;">
                             <label for="aftermesh">Aftermesh :</label>
                             <select name="aftermesh" id="aftermesh">
                                 <option value="1">1</option>
@@ -76,6 +77,12 @@
                     <div id="settingsSidebar" class="sidebar flex-col center-items">
                         <div id="settingsDiv" class="flex-col"></div>
                         <div id="buttonsDiv"></div>
+                    </div>
+
+                    <div id="examplesSidebar" class="sidebar flex-col center-items">
+                        <div id="examplesWrapper">
+                            <table id="table"></table>
+                        </div>
                     </div>
                     
                     <button class="openbtn" onclick="toggleNav()">☰ Open Settings</button>

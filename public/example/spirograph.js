@@ -107,7 +107,12 @@ const sketch = (p) => {
     exampleButton = p.createButton('Examples').parent(settingsDiv)
     exampleButton.id('exampleButton')
     exampleButton.mouseReleased(e => {
-      const childWin = window.open('examples.html', '_blank', 'height=400, width=550')
+      const sidebar = document.getElementById('examplesSidebar')
+      if (sidebar.style.width === '250px') {
+        sidebar.style.width = '0px'
+      } else {
+        sidebar.style.width = '250px'
+      }
     })
 
     importButton = p.createButton('Import').parent(buttonsDiv)

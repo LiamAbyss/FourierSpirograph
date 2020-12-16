@@ -10,11 +10,6 @@ exports.sendIndexHtml = (req, res) => {
   res.sendFile(path.resolve('./public/app/index.html'))
 }
 
-exports.sendExamplesHtml = (req, res) => {
-  res.status(200)
-  res.sendFile(path.resolve('./public/app/examples.html'))
-}
-
 exports.sendExamplesJs = (req, res) => {
   res.status(200)
   res.sendFile(path.resolve('./public/app/examples.js'))

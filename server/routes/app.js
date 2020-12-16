@@ -5,7 +5,6 @@ const appCtrl = require('../controllers/app')
 
 router.get('/', appCtrl.redirect)
 router.get('/app/index.html', appCtrl.sendIndexHtml)
-router.get('/app/examples.html', appCtrl.sendExamplesHtml)
 router.get('/public/app/examples.js', appCtrl.sendExamplesJs)
 router.get('/app/example/:name', appCtrl.sendExamplesCsv)
 router.get('/app/example/img/:name', appCtrl.sendExamplesImg)
