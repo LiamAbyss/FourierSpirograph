@@ -55,8 +55,9 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     overflow: hidden;
 }
 
-#outlineSettings *:not(#thresholdSlider *){
+#outlineSettings:not(#thresholdSlider *){
     margin: 2%;
+    height: 95%;
 }
 
 #outlineSettings {
