@@ -65,6 +65,7 @@ let lastManualPath = []
 let follow = false
 let multiPaths = false
 let nCircles
+let showPreview = false
 
 const controls = {
   view: { x: 0, y: 0, zoom: 1 },
@@ -100,6 +101,18 @@ const sketch = (p) => {
           rows.map(e => e.join(',')).join('\n')
       const encodedUri = encodeURI(csvContent)
       window.location = encodedUri
+      console.log(encodedUri)
+    })
+
+    exampleButton = p.createButton('Examples').parent(settingsDiv)
+    exampleButton.id('exampleButton')
+    exampleButton.mouseReleased(e => {
+      const sidebar = document.getElementById('examplesSidebar')
+      if (sidebar.style.width === '250px') {
+        sidebar.style.width = '0px'
+      } else {
+        sidebar.style.width = '250px'
+      }
     })
 
     importButton = p.createButton('Import').parent(buttonsDiv)
@@ -134,6 +147,13 @@ const sketch = (p) => {
 
     speedSlider = p.createSlider(0.0001, 0.05, 0.007, 0.0005).parent(settingsDiv)
     speedSlider.id('speedSlider')
+
+    previewCheckbox = p.createCheckbox('Show preview', false).parent(settingsDiv)
+    previewCheckbox.id('previewCheckbox')
+    previewCheckbox.changed(() => {
+      showPreview = !showPreview
+    })
+    showPreview = false
 
     followCheckbox = p.createCheckbox('Follow path', false).parent(settingsDiv)
     followCheckbox.id('followCheckbox')
@@ -306,11 +326,18 @@ const sketch = (p) => {
     kMax = nCircles.value()
 
     // Polygonal curve:
-    // Uncomment if you want to see it.
-    p.noFill()
-    p.stroke(10, 130, 100)
-    p.strokeJoin(p.ROUND)
-    // p.beginShape()
+    if (showPreview) {
+      p.noFill()
+      p.stroke(0.5)
+      p.strokeJoin(p.ROUND)
+      p.beginShape()
+      for (let i = 0; i < size; i++) {
+        const xpos = data.getNum(i, 'x')
+        const ypos = data.getNum(i, 'y')
+        p.vertex(xpos, ypos)
+      }
+      p.endShape(p.CLOSE)
+    }
 
     for (let i = 0; i < size; i++) {
       if (data.getRowCount() < size) return
@@ -429,7 +456,7 @@ const sketch = (p) => {
     }
 
     angle -= speedSlider.value()
-    p.max += 0.2
+    p.max += speedSlider.value() * 8
 
     if (path.length > 10000) {
       path = []
@@ -497,13 +524,12 @@ const sketch = (p) => {
     arrayCy = p.make2Darray(size, size)
     for (var i = 0; i < size; i++) {
       for (var j = 0; j < size; j++) {
-        const scale = 1
-        const COSX = p.cos((j - n) * T[i]) * scale * data.getNum(i, 'x')
-        const SINX = p.sin((j - n) * T[i]) * scale * data.getNum(i, 'y')
+        const COSX = p.cos((j - n) * T[i]) * data.getNum(i, 'x')
+        const SINX = p.sin((j - n) * T[i]) * data.getNum(i, 'y')
         const valX = 1 / size * (COSX + SINX)
         arrayCx[i][j] = valX
-        const COSY = p.cos((j - n) * T[i]) * scale * data.getNum(i, 'y')
-        const SINY = p.sin((j - n) * T[i]) * scale * data.getNum(i, 'x')
+        const COSY = p.cos((j - n) * T[i]) * data.getNum(i, 'y')
+        const SINY = p.sin((j - n) * T[i]) * data.getNum(i, 'x')
         const valY = 1 / size * (COSY - SINY)
         arrayCy[i][j] = valY
       }
@@ -519,12 +545,8 @@ const sketch = (p) => {
       }
     }
 
-    // print(tempCx)
-
     Cx = p.arrayColumnsSum(tempCx)
     Cy = p.arrayColumnsSum(tempCy)
-
-    // print(Cx);
 
     for (i = 0; i < size - ((size + 1) / 2); i++) {
       CPosX[i] = Cx[i + (size + 1) / 2]
@@ -552,11 +574,9 @@ const sketch = (p) => {
 
     for (i = 0; i < size - 1; i++) {
       Rho[i] = p.dist(0, 0, CCordX[i], CCordY[i])
-      if (p.atan2(CCordY[i], CCordX[i]) < 0) {
-        Ang[i] = (p.atan2(CCordY[i], CCordX[i]) + 2 * p.PI) * 180 / (p.PI) // (PI - p.atan2(CCordY[i], CCordX[i]) )/(2*PI);
-      } else {
-        Ang[i] = p.atan2(CCordY[i], CCordX[i]) * 180 / (p.PI)
-      }
+      p.angleMode(p.DEGREES)
+      Ang[i] = p.atan2(CCordY[i], CCordX[i])
+      p.angleMode(p.RADIANS)
     }
 
     // I need to create a list of numbers so I can choose
@@ -671,6 +691,23 @@ const sketch = (p) => {
     }
     return p.createVector(sumX, sumY)
   }
+}
+
+/**
+ * Import an example
+ * @param {String} uri The uri to load
+ */
+importExample = (_uri) => {
+  if (_uri === undefined) return
+  const newData = s.loadTable(_uri, 'csv', 'header', () => {
+    console.log(newData)
+    s.resetSketch(false, undefined, newData)
+  })
+  /* if (s !== undefined) {
+    s.remove()
+  }
+  // eslint-disable-next-line new-cap
+  s = new p5(sketch) */
 }
 
 // Start drawing the spirograph

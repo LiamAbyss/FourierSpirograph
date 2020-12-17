@@ -8,12 +8,16 @@ let computeSize = -1
 */
 // eslint-disable-next-line no-unused-vars
 const toggleNav = () => {
-  const sidebar = document.getElementById('settingsSidebar')
-  if (sidebar.style.width === '250px') {
+  const settingsSidebar = document.getElementById('settingsSidebar')
+  const examplesSidebar = document.getElementById('examplesSidebar')
+  if (settingsSidebar.style.width === '250px') {
+    examplesSidebar.style.width = '0px'
+    settingsSidebar.style.width = '0px'
+    examplesSidebar.style.right = '0px'
     document.getElementsByClassName('openbtn')[0].innerHTML = '☰ Open Settings'
-    sidebar.style.width = '0px'
   } else {
-    sidebar.style.width = '250px'
+    examplesSidebar.style.right = '250px'
+    settingsSidebar.style.width = '250px'
     document.getElementsByClassName('openbtn')[0].innerHTML = '╳ Close Settings'
   }
 }

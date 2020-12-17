@@ -3,23 +3,24 @@
     <head>
       <meta charset="utf-8"/>
       <meta name="viewport" content="width=device-width, initial-scale=1"/>
-      <title>Fourier Spirograph Alpha v0.4.1</title>
+      <title>Fourier Spirograph Alpha v0.5.0</title>
       <link rel="stylesheet" href="/public/app/index.css"/>
       <link rel="stylesheet" href="/public/lib/nouislider.css"/>
       <script type="text/javascript" src="/public/app/utils.js"></script>
       <script type="text/javascript" src="/public/example/p5Utils.js"></script>
       <script src="/public/lib/nouislider.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.min.js"> </script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
       <script src="/public/example/Cam.js"> </script>      
       <script src="/public/example/spirograph.js"> </script>      
       <script src="/public/outline/main.js"></script>
+      <script type="text/javascript" src="/public/app/examples.js"></script>
       <script type="text/javascript" src="/public/app/index.js"></script>
     </head>
     <body>
         <div id="global" class="flex-col">
             <div id="title" class="center-items center-text">
                 <h1 class="center-text">Fourier Spirograph</h1>
-                <p> Alpha v0.4.1</p>
+                <p> Alpha v0.5.0</p>
             </div>
             <div id="app" class="flex-row">
                 <div id="outlineSettings" class="flex-col center-items">
@@ -57,7 +58,7 @@
                             </select>
                         </div>
                         <br/>
-                        <div class="flex-row">
+                        <div class="flex-row" style="white-space: nowrap;">
                             <label for="aftermesh">Aftermesh :</label>
                             <select name="aftermesh" id="aftermesh">
                                 <option value="1">1</option>
@@ -76,6 +77,12 @@
                     <div id="settingsSidebar" class="sidebar flex-col center-items">
                         <div id="settingsDiv" class="flex-col"></div>
                         <div id="buttonsDiv"></div>
+                    </div>
+
+                    <div id="examplesSidebar" class="sidebar flex-col center-items">
+                        <div id="examplesWrapper">
+                            <table id="table"></table>
+                        </div>
                     </div>
                     
                     <button class="openbtn" onclick="toggleNav()">☰ Open Settings</button>

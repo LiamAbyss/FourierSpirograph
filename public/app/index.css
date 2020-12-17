@@ -55,8 +55,9 @@ div#outlineSettings.flex-col.center-items, div#outlineResults.center-items {
     overflow: hidden;
 }
 
-#outlineSettings *:not(.thresholdSlider *){
-    margin: 3%;
+#outlineSettings:not(#thresholdSlider *){
+    margin: 2%;
+    height: 95%;
 }
 
 #outlineSettings {
@@ -228,7 +229,7 @@ button:active, .input-button:active{
     z-index: 1;
     bottom: 0;
     right: 0;
-    background-color: rgb(153, 153, 153);;
+    background-color: rgb(153, 153, 153);
     overflow-x: hidden;
     transition: 0.2s;
     color: white;
@@ -275,4 +276,50 @@ button:active, .input-button:active{
     .sidebar {padding-top: 15px;}
     .sidebar a {font-size: 18px;}
 }
+/* -------------------- */
+
+/* Examples Sidebar */
+
+#examplesSidebar{
+    right: 250px;
+    background-color: rgb(124, 124, 124);
+    justify-content: space-around;
+    height: 100%;
+}
+
+#examplesWrapper {
+    overflow: auto;
+    max-width: max-content;
+    justify-content: space-around;
+    margin: 2.5% 2.5%;
+    display: flex;
+    height: 100%;
+}
+
+table {
+    height: 90%;
+    justify-content: space-around;
+    margin-left: auto;
+    margin-right: auto;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+td {
+    border: none;
+    border-collapse: collapse;
+    border-spacing: 5px;
+    min-width: 100px;
+}
+
+tr:hover {
+    background-color: rgb(243, 241, 241);
+    cursor: pointer;
+    color: black;
+}
+
+table img {
+    width: 80%;
+}
+
 /* -------------------- */
