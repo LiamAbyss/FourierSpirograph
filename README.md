@@ -1,7 +1,7 @@
 <h1 align="center"> FourierSpirograph </h1>
 
 <p align="center">
-<img src="https://img.shields.io/badge/version-0.4.1-blueviolet" alt="version">
+<img src="https://img.shields.io/badge/version-0.5.0-blueviolet" alt="version">
 </p>
 <p align="center">
     <img src="https://img.shields.io/badge/npm-v6.14.8-informational" alt="npm version">
