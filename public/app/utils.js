@@ -11,16 +11,12 @@ const toggleNav = () => {
   const settingsSidebar = document.getElementById('settingsSidebar')
   const examplesSidebar = document.getElementById('examplesSidebar')
   if (settingsSidebar.style.width === '250px') {
-    if (examplesSidebar.style.width !== '0px') {
-      examplesSidebar.style.width = '0px'
-      setTimeout(() => {
-        settingsSidebar.style.width = '0px'
-      }, 200)
-    } else {
-      settingsSidebar.style.width = '0px'
-    }
+    examplesSidebar.style.width = '0px'
+    settingsSidebar.style.width = '0px'
+    examplesSidebar.style.right = '0px'
     document.getElementsByClassName('openbtn')[0].innerHTML = '☰ Open Settings'
   } else {
+    examplesSidebar.style.right = '250px'
     settingsSidebar.style.width = '250px'
     document.getElementsByClassName('openbtn')[0].innerHTML = '╳ Close Settings'
   }

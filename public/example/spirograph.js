@@ -456,7 +456,7 @@ const sketch = (p) => {
     }
 
     angle -= speedSlider.value()
-    p.max += 0.2
+    p.max += speedSlider.value() * 8
 
     if (path.length > 10000) {
       path = []
