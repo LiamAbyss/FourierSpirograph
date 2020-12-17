@@ -1,17 +1,26 @@
 [
     {
-        "name": "acorn"
+        "name": "Acorn"
     },
     {
-        "name": "pi"
+        "name": "Pi"
     },
     {
-        "name": "junia"
+        "name": "Junia"
     },
     {
-        "name": "mickey"
+        "name": "Microsoft"
     },
     {
-        "name": "fourier"
+        "name": "Mickey"
+    },
+    {
+        "name": "Fourier"
+    },
+    {
+        "name": "Canarticho"
+    },
+    {
+        "name": "Squid"
     }
 ]
