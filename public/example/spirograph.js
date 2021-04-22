@@ -102,8 +102,22 @@ const sketch = (p) => {
       })
       const csvContent = 'data:text/csv;charset=utf-8,' +
           rows.map(e => e.join(',')).join('\n')
-      const encodedUri = encodeURI(csvContent)
-      window.location = encodedUri
+      var link = document.createElement('a')
+      if (typeof link.download === 'string') {
+        link.href = csvContent
+        link.download = Math.random().toString(36).substring(7) + '.csv'
+
+        // Firefox requires the link to be in the body
+        document.body.appendChild(link)
+
+        // simulate click
+        link.click()
+
+        // remove the link when done
+        document.body.removeChild(link)
+      } else {
+        window.open(uri)
+      }
     })
 
     exampleButton = p.createButton('Examples').parent(settingsDiv)
