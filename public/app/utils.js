@@ -267,3 +267,20 @@ const toggleThresholds = () => {
   }
   toggleThresholdButton.toggled = !toggleThresholdButton.toggled
 }
+
+/**
+ * Returns the GET parameter which name is parameterName
+ * @param {String} parameterName
+ */
+const findGetParameter = (parameterName) => {
+  let result
+  let tmp = []
+  location.search
+    .substr(1)
+    .split('&')
+    .forEach(function (item) {
+      tmp = item.split('=')
+      if (tmp[0] === parameterName && tmp[1].length > 0) result = decodeURI(tmp[1])
+    })
+  return result
+}
