@@ -25,6 +25,15 @@ html, body {
     margin-top: 15px;
 }
 
+#link {
+    position: absolute;
+    font-family: 'Courier New', Courier, monospace;
+    right: 1%;
+    top: 3.5%;
+    z-index: 1;
+    font-weight: bold;
+}
+
 #title, #title > * {
     height: 10%;
     width: 98%;
@@ -226,7 +235,7 @@ button:active, .input-button:active{
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 1;
+    z-index: 10;
     bottom: 0;
     right: 0;
     background-color: rgb(153, 153, 153);

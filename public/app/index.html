@@ -17,10 +17,11 @@
       <script type="text/javascript" src="/public/app/index.js"></script>
     </head>
     <body>
+        <a href='https://github.com/LiamAbyss/FourierSpirograph' id="link" target="_blank">Github repository</a>
         <div id="global" class="flex-col">
             <div id="title" class="center-items center-text">
-                <h1 class="center-text">Fourier Spirograph</h1>
-                <p> Alpha v0.5.0</p>
+                <h1 class="center-text" onclick="window.location = '/app/index.html'" style="cursor: pointer;">Fourier Spirograph</h1>
+                <p> Alpha v0.6.0</p>
             </div>
             <div id="app" class="flex-row">
                 <div id="outlineSettings" class="flex-col center-items">
@@ -32,7 +33,7 @@
                         <input type="file" id="uploadImage" accept="image/*"/>
                         <div id="imageMarginDiv" class="center-text">
                             <label for="imageMargin">Margin</label>
-                            <input type="number" id="imageMargin" name="imageMargin" min="0" value="0"/>
+                            <input type="number" id="imageMargin" name="imageMargin" min="0" value="0" max="100"/>
                         </div>
                     </div>
                     <div id="thresholdSlider"></div>
@@ -76,6 +77,7 @@
                 <div id="outlineResults" class="center-items flex-col">
                     <div id="settingsSidebar" class="sidebar flex-col center-items">
                         <div id="settingsDiv" class="flex-col"></div>
+                        <div id="shareDiv" class="center-text"></div>
                         <div id="buttonsDiv"></div>
                     </div>
 

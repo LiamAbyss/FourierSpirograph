@@ -3,8 +3,10 @@
 
 let s
 
+let usedHeader = false
+const apiKey = 'eb2670305d6df60c93f2f63e962c72065d817888766544b17f17b04edc27f0d0'
 let uri, parent, tracePath, canvasWidth, canvasHeight
-let settingsDiv, buttonsDiv
+let settingsDiv, buttonsDiv, shareDiv
 
 let data // list of points, dataset
 let size // number of points in the dataset
@@ -45,6 +47,7 @@ let K = []
 let sel
 let exportButton
 let importButton
+let shareButton
 let show = true
 const offset = 350
 
@@ -146,6 +149,44 @@ const sketch = (p) => {
       document.getElementById('importButton').click()
     })
 
+    shareButton = p.createButton('Share').parent(shareDiv)
+    shareButton.id('shareButton')
+    shareButton.mouseReleased(e => {
+      const newData = []
+      for (let i = 0; i < data.getRowCount(); i++) {
+        newData.push({
+          x: data.getNum(i, 'x'),
+          y: data.getNum(i, 'y')
+        })
+      }
+
+      const rows = []
+      newData.forEach(e => {
+        rows.push([e.x, e.y])
+      })
+      const csvContent = rows.map(e => e.join(',')).join('\n')
+      const encodedData = encodeURI(csvContent)
+      const headers = new Headers()
+      headers.append('API-KEY', apiKey)
+      headers.append('Content-Type', 'application/x-www-form-urlencoded')
+
+      fetch('https://look-me-up.herokuapp.com/create', {
+        method: 'POST',
+        body: `value=${encodedData}`,
+        headers: headers,
+        mode: 'cors'
+      }).then(res => {
+        res.text().then(finalRes => {
+          var tempInput = document.createElement('input')
+          tempInput.value = `https://fourierspirograph.herokuapp.com/app/index.html?share=${finalRes}`
+          document.body.appendChild(tempInput)
+          tempInput.select()
+          document.execCommand('copy')
+          document.body.removeChild(tempInput)
+        })
+      })
+    })
+
     sketchModeLabel = p.createP('Sketch Mode :').parent(settingsDiv)
     sketchModeLabel.id('sketchModeLabel')
 
@@ -202,6 +243,7 @@ const sketch = (p) => {
     angle = p.PI / 3
 
     p.resetSketch()
+
     // print(K);
   }
 
@@ -488,6 +530,7 @@ const sketch = (p) => {
     if (sort === undefined) sort = true
     if (newData === undefined) newData = data
     data = newData
+
     path = []
     arrayCx = []
     arrayCy = []
@@ -616,6 +659,26 @@ const sketch = (p) => {
       const seq = p.ceil((i + 1) / 2) * p.pow((-1), (i + 2))
       K[i] = seq
     }
+
+    const shareParam = findGetParameter('share')
+    if (shareParam !== undefined && !usedHeader) {
+      usedHeader = true
+      const headers = new Headers()
+      headers.append('API-KEY', apiKey)
+
+      fetch(`https://look-me-up.herokuapp.com/get/${shareParam}`, {
+        method: 'GET',
+        headers: headers
+      }).then(res => {
+        res.text().then(finalRes => {
+          const ref = 'data:text/csv;charset=utf-8,x,y%0A' + encodeURI(finalRes)
+          const newData = p.loadTable(ref, 'csv', 'header')
+          setTimeout(() => {
+            p.resetSketch(false, undefined, newData)
+          }, 1)
+        })
+      })
+    }
   }
 
   // set and draw the shape
@@ -727,6 +790,7 @@ importExample = (_uri) => {
 const launchSpirograph = (_uri, _parent, _tracePath, _canvasWidth, _canvasHeight) => {
   settingsDiv = document.getElementById('settingsDiv')
   buttonsDiv = document.getElementById('buttonsDiv')
+  shareDiv = document.getElementById('shareDiv')
   aftermeshed = false
 
   uri = _uri
